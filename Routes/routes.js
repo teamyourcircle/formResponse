@@ -1,31 +1,35 @@
 const express = require('express');
 const mongoose = require('mongoose');
 // const {MongoClient} = require('mongodb');
-const uuidv4=require('uuid');
+const { v4:uuidv4 } = require('uuid');
 const respSchema=require('../Model/responseSchema');
 
-let resp={};
+// let resp={};
 
 const router=express.Router();
 router.use(express.json());
 // console.log("Routes here");
 
-router.get("/meet/:meetId", (req, res, next) => {
+router.put("/meet/:meetId", (req, res) => {
     console.log("Hey!!");
-    res.send(req.body.json());
-    next();
+    res.send(req.body);
+    
 })
 router.post("/meet", async (req,res)=>{
 
-    resp=new respSchema({
-        formId:req.body.formId,
-        responseId:req.body.uuidv4.v4(),
+    let resp=new respSchema({
+        formId:req.body.form_id,
+        responseId:uuidv4(),
         responseBy:req.body.responseBy,
-        sections:req.body.sections
+        sections:req.body.section_list
     });
+    console.log(resp);
+    // res.send(resp);
 
+    //saving to mongoDB
     const idSave = await resp.save();
-    res.json(idSave);
+    console.log("SavedId",idSave);
+    res.send(idSave);
 });
 // const app = express();
 

@@ -11,9 +11,14 @@ app.use(cors());
 console.log('FormResponse service Activated..!!');
 
 const port = process.env.port || 6000;
-const uri = "https://mongodb+srv://hardikshah:8630877372@hs@mycluster.hb4pm.mongodb.net/Test?retryWrites=true&w=majority;"
+const uri = process.env.URI || "https://mongodb+srv://hardikshah:8630877372@hs@mycluster.hb4pm.mongodb.net/Test?retryWrites=true&w=majority" ;
 
-app.use('/api/meet', formRoute);
+//tester middleware
+app.use(express.json());
+const testFun = require('./MiddleWareFun/auth');
+app.use(testFun);
+
+app.use('/api', formRoute);
 
 // const client = MongoClient(uri);
 mongoose.connect( uri, {
