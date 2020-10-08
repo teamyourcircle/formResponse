@@ -1,0 +1,25 @@
+{
+  "name": "formresponse",
+  "version": "1.0.0",
+  "description": "```\r contributed by suhail \r and hardik helped suhail .",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hardikshah197/formResponse.git"
+  },
+  "author": "Hardik Sharma",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hardikshah197/formResponse/issues"
+  },
+  "homepage": "https://github.com/hardikshah197/formResponse#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.8",
+    "uuid": "^8.3.1"
+  }
+}
