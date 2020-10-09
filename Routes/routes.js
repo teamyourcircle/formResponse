@@ -6,6 +6,19 @@ const respSchema=require('../Model/responseSchema');
 
 const router=express.Router();
 router.use(express.json());
+
+/*
+Now get request is to be created and in this get request
+formId is send and you have to return the array of responses from that formId
+and on the basis of that array visual graphs is to be created
+*/
+
+router.get('/get/:formId',(req,res)=>{
+
+})
+
+
+
 // console.log("Routes here");
 /*curl -X PUT -H "Content-Type: application/json" -d '{"data":[{ "is_choice":true,"skills":{"c":1,"python":1,"ruby":0} }]}' http://localhost:6000/api/response/5f80c8321d4dcf2434a9a0c5
 */
