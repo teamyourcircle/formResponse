@@ -7,12 +7,18 @@ const respSchema=require('../Model/responseSchema');
 const router=express.Router();
 router.use(express.json());
 // console.log("Routes here");
-
+//curl -X PUT -H "Content-Type: application/json" -d '{"key1":"value"}' http://localhost:6000/api/response/5f80c8321d4dcf2434a9a0c5
 router.put("/response/:responseId", async (req, res) => {
+        //incoming data should be 
+        /*
+        data:[
+        { "is_choice":true,"skills":{"c":1,"python":1,"ruby":0} }
+        ]
+        */
+        console.log(req.body);
         const responseId = req.params.responseId; 
-        const response = respSchema.findOne({"responseId":responseId});
-        req.json({"response":response});
-
+        const response = await respSchema.findOne({"_id":responseId});
+        res.json({"status":"Added"});
 })
 //curl testing
 /*
