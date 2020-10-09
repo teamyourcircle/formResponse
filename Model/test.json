@@ -1,0 +1,26 @@
+
+{
+"form_id":"32",
+"responseBy":"kumarnitesh2000.nk@gmail.com",
+"section_list":[
+  [{
+  "is_choice":false,
+  "name":"Nitesh Kumar Arora"
+},{
+  "is_choice":true,
+  "gender":{"male":1,"female":0,"others":0}
+},
+{
+  "is_choice":false,
+  "roll-number":1806810217
+}
+],
+[
+  {
+    "is_choice":true,
+    "skills":{"c":1,"python":1,"ruby":0}
+  }
+]
+]
+
+}
