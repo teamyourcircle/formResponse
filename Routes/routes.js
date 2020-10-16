@@ -18,7 +18,7 @@ router.get('/get/form/:formId',async (req,res)=>{
   const formId = req.params.formId;
   //response is the array of responses .
   const response = await respSchema.find({"formId":formId});
-  
+    
   res.json({"responseArray":response});
 
 
