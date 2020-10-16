@@ -68,7 +68,7 @@ curl --header "Content-Type: application/json" --request POST --data '
 ]
 ]
 
-}' http://localhost:6000/api/response
+}' http://localhost:5000/api/response
 */
 
 router.post("/response", async (req,res)=>{
