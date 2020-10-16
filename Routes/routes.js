@@ -13,11 +13,25 @@ formId is send and you have to return the array of responses from that formId
 and on the basis of that array visual graphs is to be created
 */
 
-router.get('/get/:formId',(req,res)=>{
+router.get('/get/form/:formId',async (req,res)=>{
+
+  const formId = req.params.formId;
+  //response is the array of responses .
+  const response = await respSchema.find({"formId":formId});
+  
+  res.json({"responseArray":response});
+
 
 })
 
+//now we want that particular response info get 
+router.get('/get/response/:responseId',async (req,res)=>{
 
+  const responseId = req.params.responseId;
+  const response = await respSchema.findOne({"_id": responseId});
+  res.send({"response":response});
+
+});
 
 // console.log("Routes here");
 /*curl -X PUT -H "Content-Type: application/json" -d '{"data":[{ "is_choice":true,"skills":{"c":1,"python":1,"ruby":0} }]}' http://localhost:6000/api/response/5f80c8321d4dcf2434a9a0c5
@@ -38,23 +52,23 @@ router.put("/response/:responseId", async (req, res) => {
 curl --header "Content-Type: application/json" --request POST --data '
 {
 "form_id":"32",
-"responseBy":"kumarnitesh2000.nk@gmail.com",
+"responseBy":"nitesh.nk@gmail.com",
 "section_list":[
   [{
   "is_choice":false,
-  "name":"Nitesh Kumar Arora"
+  "name":"Anmol Kumar Arora"
 },{
   "is_choice":true,
-  "gender":{"male":1,"female":0,"others":0}
+  "gender":{"male":0,"female":1,"others":0}
 },
 {
   "is_choice":false,
-  "roll-number":1806810217
+  "roll-number":1806810227
 }
 ]
 ]
 
-}' http://localhost:6000/api/meet
+}' http://localhost:6000/api/response
 */
 
 router.post("/response", async (req,res)=>{
