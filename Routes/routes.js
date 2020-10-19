@@ -29,7 +29,14 @@ router.get('/get/response/:responseId',async (req,res)=>{
 
   const responseId = req.params.responseId;
   const response = await respSchema.findOne({"_id": responseId});
-  res.send({"response":response});
+  const section = response.sections;
+  let fieldArray  = [];
+  section.map(s => {
+    s.map(f =>{
+      fieldArray.push(f);
+    })
+  })
+  res.send({"response":fieldArray});
 
 });
 
