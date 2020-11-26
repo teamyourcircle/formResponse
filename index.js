@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 
 
-const port = process.env.port || 5000;
+const port = process.env.port || 5002;
 const uri = process.env.URI ;
 console.log('FormResponse service Activated..!! on port '+port);
 //tester middleware
