@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const fetch = require('node-fetch');
 
 const respSchema=require('../Model/responseSchema');
 
@@ -7,6 +8,9 @@ const router=express.Router();
 router.use(express.json());
 
 router.get('/get/form/:formId',async (req,res)=>{
+
+  // curl http://localhost:5002/get/form/51
+
 
   const formId = req.params.formId;
   //response is the array of responses .
@@ -81,4 +85,32 @@ router.post("/response", async (req,res)=>{
 });
 // const app = express();
 
+// http://localhost:8000/forms/delete/id 
+                                              
+router.delete('/forms/delete', async(req,res)=>{
+
+  const formId = req.body.formId;
+ 
+  
+try {
+  let response = await fetch(`http://localhost:8000/forms/delete/${formId}`);
+  if (response.ok) { // if HTTP-status is 200-299
+    // get the response body (the method explained below)
+    let json = await response.json();
+    const resultData = await respSchema.deleteMany({"formId":formId});
+  res.status(200).json({status:"Deleted"});
+    console.log(json);
+  } else {
+    // console.log("HTTP-Error: " + response.status);
+    res.status(response.status).json({status:response.status});
+  }
+  
+} catch (err) {
+  console.log(err);
+  res.status(500).json('Internal error');
+}
+
+});
+
+// curl -X DELETE -H "Content-Type: application/json" -d '{"formId": "51"}' http://localhost:5002/api/forms/delete
 module.exports = router;
