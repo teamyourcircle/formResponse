@@ -1,25 +1,52 @@
+const { response } = require('express');
 const express = require('express');
 const mongoose = require('mongoose');
 const fetch = require('node-fetch');
+const helper = require('./helper');
 
 const respSchema=require('../Model/responseSchema');
 
 const router=express.Router();
 router.use(express.json());
 
-router.get('/get/form/:formId',async (req,res)=>{
 
-  // curl http://localhost:5002/get/form/51
-
+//get all the responses by form_id test
+router.get('/get/form/:formId', (req,res)=>{
 
   const formId = req.params.formId;
-  //response is the array of responses .
-  const response = await respSchema.find({"formId":formId});
-    
-  res.json({"responseArray":response});
-
+  fetch(`http://localhost:8000/forms/form_info/${formId}`).then(response => {
+    if(response.ok){
+      response.json().then(data => {
+        const fields = data['template']['field']['field_label'];
+        respSchema.aggregate([
+          { $match: {'formId': parseInt(formId) } },
+        ]).exec((err,responses) => {
+          if(err===null){
+          let selected_responses = [];
+          responses.map(response => {
+            let labels = [];
+            response.sections.map(section => {
+              section.map(field => {
+                labels.push(Object.keys(field)[1]);
+              })
+            })
+            if(helper(fields,labels)){
+              selected_responses.push(response);
+            }
+          })  
+          res.json({"responseArray":selected_responses});
+        }
+        else{
+          res.status(500).json({'Status':'Internal Server Error'})
+        }
+        })
+      })
+    }
+  })
+ 
 
 })
+
 
 //now we want that particular response info get 
 router.get('/get/response/:responseId',async (req,res)=>{
