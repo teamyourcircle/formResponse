@@ -1,0 +1,169 @@
+swagger: '2.0'
+info:
+  title: Form Public Routes
+  description: Apis for FormService Public EndPoints
+  version: 1.0.0
+consumes:
+  - application/json
+produces:
+  - application/json
+  
+host: localhost:5002
+basePath: /form/api
+schemes:
+  - http
+  
+paths:
+  /myforms:
+    get:
+      summary: Returns The array of forms created by user whose api key is mentioned
+      parameters:
+        - in: query
+          name: key
+          required: true
+          type: string
+          description: mention your api_key
+      description: >-
+        ``` So this Api Simply Returns The array of forms created by user whose api key is mentioned ```
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        401:
+          description: key is not Authorized
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: Token not recognized
+        default:
+          description: Unexpected error 
+  /forms/delete:
+    delete:
+      summary: Delete the form-template as well as form-responses by id
+      parameters:
+        - in: query
+          name: key
+          required: false
+          type: string
+          description: mention your api_key
+        - in: body
+          name: formId
+          required: true
+          schema:
+            type: object
+            properties:
+              formId:
+                type: integer
+          description: mention your form_id 
+      description: >-
+        ``` So this Api Delete the form-template as well as form-responses by id ```
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Deleted
+          schema:
+            type: object
+            properties: 
+              status: 
+                type: string
+                example: Deleted
+        401:
+          description: key is not Authorized
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: Token not recognized
+        404:
+          description: form-template not found      
+        default:
+          description: Unexpected error          
+  /get/form/{formId}:
+    get:
+      summary: Get all the responses of form by formId
+      parameters:
+        - in: query
+          name: key
+          required: false
+          type: string
+          description: mention your api_key
+        - in: path
+          name: formId
+          required: true
+          type: integer
+          description: mention your form_id 
+      description: >-
+        ``` So this Api Get all the responses of form by formId ```
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        401:
+          description: key is not Authorized
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: Token not recognized
+        404:
+          description: form with given formId not found 
+          schema:
+            type: object
+            properties:
+              Status:
+                type: string
+                example: Not Found Error
+
+        500:
+          description: Internal Server Error      
+        default:
+          description: Unexpected error        
+  /get/response/{responseId}:
+    get:
+      summary: Get particular response by giving responseId
+      parameters:
+        - in: query
+          name: key
+          required: false
+          type: string
+          description: mention your api_key
+        - in: path
+          name: responseId
+          required: true
+          type: string
+          description: mention responseId 
+      description: >-
+        ``` So this Api Get particular response by giving responseId ```
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        401:
+          description: key is not Authorized
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: Token not recognized
+        404:
+          description: response with given responseid not found
+          schema:
+            type: object
+            properties:
+              Status:
+                type: string
+                example: Not Found Error
+
+        500:
+          description: Internal Server Error      
+        default:
+          description: Unexpected error                  
