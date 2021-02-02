@@ -109,7 +109,18 @@ router.get('/get/response/:responseId',async (req,res)=>{
     res.status(200).json({"response":fieldArray});
   
   });
+
   
+
+/*curl -X PUT -H "Content-Type: application/json" -d '{"data":[{ "is_choice":true,"skills":{"c":1,"python":1,"ruby":0} }]}' http://localhost:5003/api/response/5f80c8321d4dcf2434a9a0c5
+*/
+router.put("/response/:responseId", async (req, res) => {
+  const responseId = req.params.responseId; 
+  const response = await respSchema.update({"_id": responseId},{$push:{"sections":req.body.data}});
+  res.json({"status":"Added"});
+})
+
+
   
 
 module.exports = router;
