@@ -25,7 +25,8 @@ app.use('/form/api',formInforoute);
 
 const socketHandlerMiddleware = (req,res,next) => {
     if(req.method=='POST'){
-        io.sockets.emit('new-response');
+        const roomId = req.body.form_id;  
+        io.to(roomId).emit('new-response');
     }
     next();
 }
@@ -42,9 +43,14 @@ mongoose.connect( uri, {
 /*
 * socket connection handler
 */
-io.on('connection', (socket) =>{
-    console.log('user connected');
-    socket.on('disconnect', (socket) =>{
-      console.log('user disconnected');
+io.on("connection", socket => {
+    socket.on("join", async room => {
+    console.log('join the room :: '+room);
+      socket.join(room);
     })
+
+    socket.on('disconnect', () =>{
+        console.log('client disconnected');
+    })
+
 })
