@@ -1,7 +1,9 @@
 const {google} = require('googleapis');
 const sheets = google.sheets('v4');
+const fetch = require('node-fetch');
 
 const googleSheetMaker = (req, res, next) => {
+  const integration_id = 'google-sheets';
   const { client_id, client_secret, redirect_uri, access_token } = req.body;
   let spreadId = "";
   authorize(createSheet);
@@ -26,11 +28,25 @@ const googleSheetMaker = (req, res, next) => {
       fields: 'spreadsheetId',
     }, (err, spreadsheet) =>{
       if (err) {
-        return res.status(500).json({'msg':`error :: ${err.errors[0].message}`})
+        return res.status(500).json({'msg':`error :: ${err}`})
       } else {
+        const integration_id = 'google-sheets';
         let spreadsheet_id = spreadsheet.data.spreadsheetId;
-        console.log(spreadsheet_id);
-        next();
+        // add data to spreadsheet here 
+        fetch('http://localhost:5000/auth/api/oauth/edit/'+integration_id,{
+          method: 'PUT',
+          headers: {
+            'access-token': req.headers['access-token'],
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body:JSON.stringify({[req.form.form_id]: spreadsheet_id})
+        })
+        .then(res => res.json())
+        .then(data => next())
+        .catch(err =>{
+          return res.status(500).json({'msg':`error :: ${err.message}`})
+        })
       }
     });
   }

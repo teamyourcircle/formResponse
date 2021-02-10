@@ -17,6 +17,9 @@ const dashResponse = (req, res, next) => {
     fetch(url, options)
     .then(res => res.json())
     .then( data => {
+        if(data.msg){
+            return res.status(403).json({'msg':`err :: ${data.msg}`});
+        }
         req.formData = data.form;
         next();
     })

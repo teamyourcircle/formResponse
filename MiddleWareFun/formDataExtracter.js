@@ -5,7 +5,10 @@ const dataExtracter = (req, res, next) => {
     const formObj = validate_form_created_by_current_user(req.formData, req.body.form_id);
     if(!formObj.length){
         return res.status(404).json({'msg':`form with form_id ${req.body.form_id} not exist`});
-    }else{
+    }else if(formObj===undefined){
+        return res.status(403).json({'msg':`not correct user`});
+    }   
+    else{
         req.form = formObj[0];
     }
     const url = `http://localhost:5002/form/api/get/form/${req.form.form_id}`;
@@ -44,5 +47,8 @@ const dataExtracter = (req, res, next) => {
 module.exports = dataExtracter;
 
 const validate_form_created_by_current_user  = (formsByUser, form_id) =>{
+    if(formsByUser===undefined){
+        return ;
+    }
     return formsByUser.filter(form => form.form_id==form_id);
 }
