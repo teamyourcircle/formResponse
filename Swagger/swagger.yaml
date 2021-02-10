@@ -7,24 +7,23 @@ consumes:
   - application/json
 produces:
   - application/json
-  
 host: localhost:5002
 basePath: /form/api
 schemes:
   - http
-  
 paths:
   /myforms:
     get:
       summary: Returns The array of forms created by user whose api key is mentioned
       parameters:
+        - $ref: '#/parameters/access_token'
         - in: query
           name: key
-          required: true
+          required: false
           type: string
           description: mention your api_key
       description: >-
-        ``` So this Api Simply Returns The array of forms created by user whose api key is mentioned ```
+         So this Api Simply Returns The array of forms created by user whose api key is mentioned 
       produces:
         - application/json
       responses:
@@ -59,7 +58,7 @@ paths:
                 type: integer
           description: mention your form_id 
       description: >-
-        ``` So this Api Delete the form-template as well as form-responses by id ```
+         So this Api Delete the form-template as well as form-responses by id 
       produces:
         - application/json
       responses:
@@ -98,7 +97,7 @@ paths:
           type: integer
           description: mention your form_id 
       description: >-
-        ``` So this Api Get all the responses of form by formId ```
+         So this Api Get all the responses of form by formId 
       produces:
         - application/json
       responses:
@@ -120,11 +119,52 @@ paths:
               Status:
                 type: string
                 example: Not Found Error
-
         500:
           description: Internal Server Error      
         default:
-          description: Unexpected error        
+          description: Unexpected error
+  /oauth/createSheets:
+    post:
+      summary: "Create Google SpreadSheet by giving ClientID, ClientSecret, RedirectURL and Access-token"
+      parameters:
+        - $ref: '#/parameters/access_token'
+        - in: body
+          name: body
+          schema: 
+            $ref: '#/definitions/googleOauthClient'
+          required: true
+        - in: query
+          name: key
+          required: false
+          type: string
+          description: mention your api_key
+      description: >-
+         This Api will create new Google SpreadSheet with your Google account credentials 
+      produces:
+        -  application/json
+      responses:
+        200:
+          description: OK
+        401: 
+          description: key is not Authorized
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: Token is not recognized
+        404:
+          description: Credentials with ClientID, ClientSecret, redirectUrl and Token not found
+          schema:
+            type: object
+            properties:
+              Status:
+                type: string
+                example: Not Found Error
+        500:
+          description: Internal Server Error
+        default:
+          description: Unexpected error
   /get/response/{responseId}:
     get:
       summary: Get particular response by giving responseId
@@ -140,7 +180,7 @@ paths:
           type: string
           description: mention responseId 
       description: >-
-        ``` So this Api Get particular response by giving responseId ```
+         So this Api Get particular response by giving responseId 
       produces:
         - application/json
       responses:
@@ -162,8 +202,37 @@ paths:
               Status:
                 type: string
                 example: Not Found Error
-
         500:
           description: Internal Server Error      
         default:
-          description: Unexpected error                  
+          description: Unexpected error
+definitions: 
+  googleOauthClient:
+    required:
+      - client_id
+      - client_secret
+      - redirect_uri
+      - form_id
+      - access_token
+    properties:
+      client_id:
+        type: string
+        description: >
+          google client id
+      client_secret:
+        type: string
+        description: google client secret
+      redirect_uri:
+        type: string
+        description: google redirect uri
+      form_id:
+        type: string
+      access_token:
+        type: string
+        description: google access_token
+parameters: 
+    access_token: &access_token
+      name: access-token
+      in: header
+      type: string
+          

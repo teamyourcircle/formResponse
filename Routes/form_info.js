@@ -4,14 +4,30 @@ const express = require('express');
 const router=express.Router();
 const fetch = require('node-fetch');
 const helper = require('./helper');
+const dashHit = require('../MiddleWareFun/dashboardHit');
+const dataXT = require('../MiddleWareFun/formDataExtracter');
+const GSheet = require('../MiddleWareFun/googleSheetMaker');
 
 router.get('/myforms',async (req,res)=>{
     const {key} = req.query;
-    console.log(key);
-    if(key==undefined){
+    const token = req.headers['access-token'];
+    // console.log("My key --", key);
+    if(key==undefined && token == undefined){
         return res.status(401).json({"msg":"Unauthorized"})
     }
     else{
+      if( key == undefined  ) {
+        const url = `http://localhost:8000/forms/user?token=${token}`;
+        const response = await fetch(url);
+        if(response.ok){
+            const data = await response.json()
+            return res.json({form:data.forms})
+        }
+        else{
+            return res.status(response.status).json({"msg":"Token not recognized"})
+        }
+      }
+      else{
         const url = `http://localhost:8000/forms/user?key=${key}`;
         const response = await fetch(url);
         if(response.ok){
@@ -21,8 +37,8 @@ router.get('/myforms',async (req,res)=>{
         else{
             return res.status(response.status).json({"msg":"Token not recognized"})
         }
+      }
     }
-
 })
 
                                               
@@ -79,8 +95,6 @@ router.get('/get/form/:formId', (req,res)=>{
         res.status(404).json({'Status':'Not Found Error'})
       }
     })
-   
-  
   })
   
 
@@ -110,8 +124,6 @@ router.get('/get/response/:responseId',async (req,res)=>{
   
   });
 
-  
-
 /*curl -X PUT -H "Content-Type: application/json" -d '{"data":[{ "is_choice":true,"skills":{"c":1,"python":1,"ruby":0} }]}' http://localhost:5003/api/response/5f80c8321d4dcf2434a9a0c5
 */
 router.put("/response/:responseId", async (req, res) => {
@@ -121,6 +133,11 @@ router.put("/response/:responseId", async (req, res) => {
 })
 
 
+// google sheet post route
+router.post("/oauth/createSheets",[dashHit, dataXT, GSheet], async (req, res) => {
+  //return res.json({ 'formData ': req});
+  return res.status(200).json({'msg': 'Google Sheet successfully created !!!', "ResponseData": req.my_formData});
+})
   
 
 module.exports = router;
