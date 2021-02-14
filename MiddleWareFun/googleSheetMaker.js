@@ -1,9 +1,14 @@
 const {google} = require('googleapis');
 const sheets = google.sheets('v4');
 const fetch = require('node-fetch');
+const {
+maxRowCount,
+buildHeaderRowRequest,
+buildRowsForData
+} = require('../util/create_sheet_helper');
+
 
 const googleSheetMaker = (req, res, next) => {
-  const integration_id = 'google-sheets';
   const { client_id, client_secret, redirect_uri, access_token } = req.body;
   let spreadId = "";
   authorize(createSheet);
@@ -21,17 +26,24 @@ const googleSheetMaker = (req, res, next) => {
     const resource = {
       properties: {
         title: req.form.form_title,
-      }
+      },
+      sheets: [
+        {
+          properties:{
+            title: 'form response'
+          }
+        }
+      ]
     };
     sheets.spreadsheets.create({
       resource,
-      fields: 'spreadsheetId',
     }, (err, spreadsheet) =>{
       if (err) {
         return res.status(500).json({'msg':`error :: ${err}`})
       } else {
         const integration_id = 'google-sheets';
-        let spreadsheet_id = spreadsheet.data.spreadsheetId;
+        var spreadsheet_id = spreadsheet.data.spreadsheetId;
+        var sheetId = spreadsheet.data.sheets[0].properties.sheetId;
         // add data to spreadsheet here 
         fetch('http://localhost:5000/auth/api/oauth/edit/'+integration_id,{
           method: 'PUT',
@@ -40,15 +52,82 @@ const googleSheetMaker = (req, res, next) => {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body:JSON.stringify({[req.form.form_id]: spreadsheet_id})
+          body:JSON.stringify({[req.form.form_id]: {
+            spreadsheet_id,
+            sheetId
+          }})
         })
         .then(res => res.json())
-        .then(data => next())
+        .then(data => addValuesToSheet(sheets,spreadsheet_id,sheetId))
         .catch(err =>{
           return res.status(500).json({'msg':`error :: ${err.message}`})
         })
       }
     });
+  }
+
+  function addValuesToSheet(sheets,spreadsheet_id,sheetId) {
+    var data = req.my_formData;
+    let COLUMNS = Object.keys(data).map(key => key);
+    var requests = [
+      buildHeaderRowRequest(sheetId,COLUMNS,data),
+    ];
+    //row Count
+    let row_count = maxRowCount(data);
+    // Resize the sheet.
+    requests.push({
+      updateSheetProperties: {
+        properties: {
+          sheetId: sheetId,
+          gridProperties: {
+            rowCount: row_count+1,
+            columnCount: COLUMNS.length+1
+          }
+        },
+        fields: 'gridProperties(rowCount,columnCount)'
+      }
+    });
+    // Set the cell values.
+    requests.push({
+      updateCells: {
+        start: {
+          sheetId: sheetId,
+          rowIndex: 1,
+          columnIndex: 0
+        },
+        rows: buildRowsForData(row_count,COLUMNS,data),
+        fields: '*'
+      }
+    });
+    //single request
+    var request = {
+      spreadsheetId: spreadsheet_id,
+      resource: {
+        requests: requests
+      }
+    };
+    //batch update request
+      sheets.spreadsheets.batchUpdate(request, function(err, response) {
+        if (err) {
+          return res.status(500).json({'msg':`error :: ${err}`})
+        }
+        //final response
+        if(response.status==200){
+          req.response_from_google = {
+            url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
+            status: 200,
+            source: response.request.responseURL
+          };
+        }else{
+          req.response_from_google = {
+            status: response.status,
+            error: response.statusText,
+            source: response.request.responseURL
+          }
+        }
+        
+        next()
+      });
   }
  
 }

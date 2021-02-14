@@ -135,7 +135,7 @@ router.put("/response/:responseId", async (req, res) => {
 
 // google sheet post route
 router.post("/oauth/createSheets",[dashHit, dataXT, GSheet], async (req, res) => {
-  return res.status(200).json({"responses": req.my_formData});
+  return res.status(req.response_from_google.status).json({"response":req.response_from_google});
 })
   
 
