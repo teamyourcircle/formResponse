@@ -9,7 +9,7 @@ buildRowsForData
 
 
 const googleSheetMaker = (req, res, next) => {
-  const { client_id, client_secret, redirect_uri, access_token } = req.body;
+  const { client_id, client_secret, redirect_uri} = req.body;
   let spreadId = "";
   authorize(createSheet);
   function authorize(callback) {
@@ -18,7 +18,7 @@ const googleSheetMaker = (req, res, next) => {
       client_secret,
       redirect_uri
     );
-    oAuth2Client.setCredentials({ "access_token": access_token});
+    oAuth2Client.setCredentials({ "access_token": req.body.access_token});
     callback(oAuth2Client);
   }
   function createSheet(auth) {
@@ -39,7 +39,13 @@ const googleSheetMaker = (req, res, next) => {
       resource,
     }, (err, spreadsheet) =>{
       if (err) {
-        return res.status(500).json({'msg':`error :: ${err}`})
+        /*
+        * here may be access token is expired so we can refresh it 
+        * add if we get access_token :: (200) then set to req.body.access_token
+        * and again call authorize(createSheet)
+        * but if no access_token :: (!200) do nothing
+        */
+        return res.status(err.response.status).json({'msg':`error : ${err.response.data.error.message}`})
       } else {
         const integration_id = 'google-sheets';
         var spreadsheet_id = spreadsheet.data.spreadsheetId;
