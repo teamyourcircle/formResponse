@@ -45,7 +45,33 @@ const googleSheetMaker = (req, res, next) => {
         * and again call authorize(createSheet)
         * but if no access_token :: (!200) do nothing
         */
-        return res.status(err.response.status).json({'msg':`error : ${err.response.data.error.message}`})
+        if(err.response.status == 401){
+          const option = {
+            method: 'POST',
+            headers: {
+              'access-token': req.headers['access-token'],
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({"oauth_provider": "google",
+            "integration_id": "google-sheets"})
+          }
+          fetch('http://localhost:5000/auth/api/refreshoauthAccess', option)
+          .then(res => {
+            if(res.ok){
+              return res.json();
+            }
+            else{
+              throw new Error('Refresh token not available as Access-Token is not correct'); 
+            }
+          })
+          .then(data => {
+            req.body.access_token = data.access_token;
+            authorize(createSheet);
+          })
+          .catch(err => res.status(401).json({'msg':`error : ${err}`}));
+        }
+        // return res.status(err.response.status).json({'msg':`error : ${err.response.data.error.message}`})
       } else {
         const integration_id = 'google-sheets';
         var spreadsheet_id = spreadsheet.data.spreadsheetId;
