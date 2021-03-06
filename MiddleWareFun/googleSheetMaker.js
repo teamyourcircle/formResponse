@@ -45,6 +45,7 @@ const googleSheetMaker = (req, res, next) => {
         * and again call authorize(createSheet)
         * but if no access_token :: (!200) do nothing
         */
+       if(err.response!=undefined){
         if(err.response.status == 401){
           const option = {
             method: 'POST',
@@ -71,7 +72,9 @@ const googleSheetMaker = (req, res, next) => {
           })
           .catch(err => res.status(401).json({'msg':`error : ${err}`}));
         }
-        // return res.status(err.response.status).json({'msg':`error : ${err.response.data.error.message}`})
+      }else{
+        return res.status(500).json({'msg':`error : ${err.message}`})
+      }
       } else {
         const integration_id = 'google-sheets';
         var spreadsheet_id = spreadsheet.data.spreadsheetId;
