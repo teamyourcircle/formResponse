@@ -143,24 +143,20 @@ router.delete("/delete/response",[dashHit], async (req, res) => {
   const formId = req.body.form_id;
   const responseId = req.body.response_id
   const token = req.headers['access-token'];
-  if(token == undefined)
-    return res.status(401).json({"msg":"Unauthorized"})
-  else{
-    if(req.formData.length){
-      req.formData.forEach(async e => {
-        if(e.form_id == formId) {
-          await respSchema.findOneAndDelete({"_id":responseId}, (err, data) => {
-            if(err || data == null)
-              return res.status(404).json({"msg":"Response not found"});
-            else
-              return res.status(200).json({status:"Deleted", "Deleted_response": data});
-          })
-        }
-      });
-    }
-    else
-      return res.status(response.status).json({"msg":"Form not found"});
+  if(req.formData.length){
+    req.formData.forEach(async e => {
+      if(e.form_id == formId) {
+        await respSchema.findOneAndDelete({"_id":responseId}, (err, data) => {
+          if(err || data == null)
+            return res.status(404).json({"msg":"Response not found"});
+          else
+            return res.status(200).json({status:"Deleted", "Deleted_response": data});
+        })
+      }
+    });
   }
+  else
+    return res.status(response.status).json({"msg":"Form not found"});
 });
   
 
