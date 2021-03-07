@@ -165,6 +165,43 @@ paths:
           description: Internal Server Error
         default:
           description: Unexpected error
+  /delete/response:
+    delete:
+      summary: Delete response of a form created by current user
+      parameters:
+        - $ref: '#/parameters/access_token'
+        - in: body
+          name: body
+          schema: 
+            $ref: '#/definitions/deleteResponse'
+          required: true
+      description: >-
+         So this API will delete the response from given form
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        401:
+          description: key is not Authorized
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: Token not recognized
+        404:
+          description: form with given formId not found 
+          schema:
+            type: object
+            properties:
+              Status:
+                type: string
+                example: Not Found Error
+        500:
+          description: Internal Server Error      
+        default:
+          description: Unexpected error
   /get/response/{responseId}:
     get:
       summary: Get particular response by giving responseId
@@ -230,6 +267,19 @@ definitions:
       access_token:
         type: string
         description: google access_token
+  deleteResponse:
+    required:
+      - response_id
+      - form_id
+    properties:
+      response_id:
+        type: string
+        description: >
+          Your Response ID
+      form_id:
+        type: string
+        description: >
+          Your form ID
 parameters: 
     access_token: &access_token
       name: access-token

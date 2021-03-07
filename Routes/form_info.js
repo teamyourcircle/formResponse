@@ -137,6 +137,27 @@ router.put("/response/:responseId", async (req, res) => {
 router.post("/oauth/createSheets",[dashHit, dataXT, GSheet], async (req, res) => {
   return res.status(req.response_from_google.status).json({"response":req.response_from_google});
 })
+
+//google sheet delete response route
+router.delete("/delete/response",[dashHit], async (req, res) => {
+  const formId = req.body.form_id;
+  const responseId = req.body.response_id
+  const token = req.headers['access-token'];
+  if(req.formData.length){
+    req.formData.forEach(async e => {
+      if(e.form_id == formId) {
+        await respSchema.findOneAndDelete({"_id":responseId}, (err, data) => {
+          if(err || data == null)
+            return res.status(404).json({"msg":"Response not found"});
+          else
+            return res.status(200).json({status:"Deleted", "Deleted_response": data});
+        })
+      }
+    });
+  }
+  else
+    return res.status(response.status).json({"msg":"Form not found"});
+});
   
 
 module.exports = router;
