@@ -150,7 +150,7 @@ router.delete("/delete/response",[dashHit], async (req, res) => {
       req.formData.forEach(async e => {
         if(e.form_id == formId) {
           await respSchema.findOneAndDelete({"_id":responseId}, (err, data) => {
-            if(err)
+            if(err || data == null)
               return res.status(404).json({"msg":"Response not found"});
             else
               return res.status(200).json({status:"Deleted", "Deleted_response": data});
