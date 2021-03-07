@@ -167,7 +167,7 @@ paths:
           description: Unexpected error
   /delete/response:
     delete:
-      summary: Delete response of particular GoogleSheet
+      summary: Delete response of a form created by current user
       parameters:
         - $ref: '#/parameters/access_token'
         - in: body
