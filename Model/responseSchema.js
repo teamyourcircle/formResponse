@@ -1,5 +1,4 @@
 const mongoose=require('mongoose');
-//const mongooseUniqueValidator=require('mongoose-unique-validator');
 
 const responseSchema=new mongoose.Schema({
 
@@ -23,15 +22,4 @@ const responseSchema=new mongoose.Schema({
         min:1
     }
 });
-
-//responseSchema.plugin(mongooseUniqueValidator);
-
 module.exports=mongoose.model('resp',responseSchema);
-/*const resp=mongoose.model('resp',responseSchema);
-
-const m=new resp;
-m.formId=32;
-m.responseBy='run@gmail.com';
-m.sections=[[1],[2]];
-console.log(m);
-*/

@@ -243,6 +243,48 @@ paths:
           description: Internal Server Error      
         default:
           description: Unexpected error
+  /get/consumers:
+    get:
+      summary: get all the consumers attached to the form
+      parameters:
+        - $ref: '#/parameters/access_token'
+        - in: query
+          name: formId
+          required: true
+          type: string
+          description: mention responseId 
+      responses:
+        200:
+          description: OK    
+        404:
+          description: Not Found
+  /update/consumers:
+    put:
+      summary: add the consumers attached to the form
+      parameters:
+        - $ref: '#/parameters/access_token'
+        - $ref: '#/parameters/consumer_queue'
+        - in: query
+          name: formId
+          required: true
+          type: string
+          description: mention responseId 
+      responses:
+        200:
+          description: OK    
+        404:
+          description: Not Found   
+  /register/form/consumers:
+    post:
+      summary: create a schema and add one consumer
+      parameters:
+        - $ref: '#/parameters/access_token'
+        - $ref: '#/parameters/consumer_queue_body'
+      responses:
+        200:
+          description: OK    
+        404:
+          description: Not Found        
 definitions: 
   googleOauthClient:
     required:
@@ -285,4 +327,21 @@ parameters:
       name: access-token
       in: header
       type: string
-          
+    consumer_queue: &consumer_queue
+      name: body
+      in: body
+      schema:
+          type: object
+          properties:
+            queueName:
+              type: string
+    consumer_queue_body: &consumer_queue_body
+      name: body
+      in: body
+      schema:
+          type: object
+          properties:
+            queueName:
+              type: string          
+            formId:
+              type: string

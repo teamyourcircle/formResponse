@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/hardikshah197/formResponse#readme",
   "dependencies": {
+    "amqplib": "^0.7.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "googleapis": "^67.0.0",
