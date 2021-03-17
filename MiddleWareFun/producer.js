@@ -4,8 +4,7 @@ const publishToQueue = async (queue, payload, durable = false) => {
         return conn.createChannel();
       }).then(function(ch) {
         return ch.assertQueue(queue).then(function() {
-            console.log('sending payload ...');
-            console.log(payload);
+            console.log(`sending payload to queue ${queue}...`);
           return ch.sendToQueue(queue, Buffer.from(JSON.stringify(payload)));
         });
       }).catch(console.warn);

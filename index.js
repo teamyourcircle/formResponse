@@ -2,11 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const swaggerRoute = require('./Swagger/swagger');
 const formInforoute = require('./Routes/form_info');
+const consumerInfoRoute = require('./Routes/consumer');
 const cors = require('cors');
 const app = express();
 const formRoute = require('./Routes/routes');
 const port = process.env.port || 5002;
 const uri = process.env.URI ;
+const consumers = require('./Consumers');
 var socket = require('socket.io');
 var server = app.listen(port, function(){
     console.log(`listening for requests on port ${port}`);
@@ -21,7 +23,7 @@ app.use(cors());
 app.use(express.json());
 const testFun = require('./MiddleWareFun/auth');
 app.use(testFun);
-app.use('/form/api',formInforoute);
+app.use('/form/api',[formInforoute,consumerInfoRoute]);
 
 const socketHandlerMiddleware = (req,res,next) => {
     if(req.method=='POST'){
@@ -39,6 +41,15 @@ mongoose.connect( uri, {
 }, () => {
     console.log('Connected to mongoDB..!');
 });
+/*
+*starting the consumers
+*/
+
+(async ()=>{
+    consumers.map(c =>{
+        c.consumer(c.queue);
+    })
+  })();
 
 /*
 * socket connection handler

@@ -7,6 +7,7 @@ open.then(function(conn) {
     return ch.assertQueue(queue).then(function() {
       return ch.consume(queue, function(msg) {
         if (msg !== null) {
+          console.log(`recieving payload from the queue :: ${queue}`);
           console.log(msg.content.toString());
           ch.ack(msg);
         }
@@ -15,6 +16,4 @@ open.then(function(conn) {
   }).catch(console.warn);
 }
 
-//module.exports = hello_consumer;
-
-hello_consumer("tasks")
+module.exports = hello_consumer;
