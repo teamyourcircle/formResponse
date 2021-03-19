@@ -15,5 +15,4 @@ open.then(function(conn) {
     });
   }).catch(console.warn);
 }
-
 module.exports = hello_consumer;
