@@ -3,8 +3,9 @@
 */
 module.exports = [
     {
-        queue: "queue",
+        queue: "hello",
         consumer: require('./hello_consumer'),
-        tags: ["hello","test"] 
+        tags: ["hello","test"] ,
+        name: "hello_consumer"
     },
 ]
