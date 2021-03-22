@@ -21,7 +21,7 @@ const validateAuthor = (req, res, next) => {
             return res.status(403).json({'msg':`err :: ${data.msg}`});
         }
         req.formData = data.form;
-        const is_validate = validate_form_created_by_current_user(data.form,req.query.formId )
+        const is_validate = validate_form_created_by_current_user(data.form,req.body.formId )
         if(is_validate.length)
         next();
         else
