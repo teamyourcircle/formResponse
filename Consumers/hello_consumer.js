@@ -15,6 +15,6 @@ open.then(function(conn) {
   }).catch(console.warn);
 }
 
-//module.exports = hello_consumer;
+// module.exports = hello_consumer;
 
 hello_consumer("tasks")
