@@ -7,7 +7,7 @@ const consumerSchema=new mongoose.Schema({
         required:true,
         unique: true
     },
-    queue:{
+    queueName:{
         type:Array,
         required: true
     }
