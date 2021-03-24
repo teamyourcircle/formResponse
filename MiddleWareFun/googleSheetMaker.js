@@ -85,12 +85,12 @@ const googleSheetMaker = (req, res, next) => {
           headers: {
             'access-token': req.headers['access-token'],
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'supportive_email': supportive_email
           },
           body:JSON.stringify({[req.form.form_id]: {
             spreadsheet_id,
             sheetId,
-            supportive_email,
           }})
         })
         .then(res => res.json())
