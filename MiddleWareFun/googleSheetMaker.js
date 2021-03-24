@@ -9,7 +9,7 @@ buildRowsForData
 
 
 const googleSheetMaker = (req, res, next) => {
-  const { client_id, client_secret, redirect_uri} = req.body;
+  const { client_id, client_secret, redirect_uri, supportive_email} = req.body;
   let spreadId = "";
   authorize(createSheet);
   function authorize(callback) {
@@ -23,7 +23,6 @@ const googleSheetMaker = (req, res, next) => {
   }
   function createSheet(auth) {
     const sheets = google.sheets({version: 'v4', auth});
-    console.log("created.........!!!!")
     const resource = {
       properties: {
         title: req.form.form_title,
@@ -90,7 +89,8 @@ const googleSheetMaker = (req, res, next) => {
           },
           body:JSON.stringify({[req.form.form_id]: {
             spreadsheet_id,
-            sheetId
+            sheetId,
+            supportive_email,
           }})
         })
         .then(res => res.json())
