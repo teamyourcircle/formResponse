@@ -34,7 +34,7 @@ const dataExtracter = (req, res, next) => {
             if(e == req.form.form_id) {
                 var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
                 flag=true;
-                return res.status(200).json({'msg': 'Sheet is already created...!!!', 'Sheet_URL': sheetUrl});
+                return res.json({'url': sheetUrl, 'status': 200 });
             }
         })
     })

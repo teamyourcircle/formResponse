@@ -296,6 +296,7 @@ definitions:
       - redirect_uri
       - form_id
       - access_token
+      - supportive_email
     properties:
       client_id:
         type: string
@@ -312,6 +313,9 @@ definitions:
       access_token:
         type: string
         description: google access_token
+      supportive_email:
+        type: string
+        description: Supportive email address
   deleteResponse:
     required:
       - response_id
