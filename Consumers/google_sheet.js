@@ -2,6 +2,8 @@ var open = require('amqplib').connect('amqp://localhost:5672');
 var env = require('../config/config')['development']
 const {google} = require('googleapis');
 const fetch = require('node-fetch');
+const sheets = google.sheets('v4')
+
 const google_sheet = async (queue, isNoAck = false, durable = false, prefetch = null) => {
 // Consumer
 open.then(function(conn) {
@@ -32,7 +34,23 @@ let document_info = {};
  */
 const add_row_to_sheet = (auth,payload) =>{
     const spreadsheetId = document_info['spreadsheet_id'];
-    const sheetId = document_info['sheetId'];
+    sheets.spreadsheets.values.append({
+        spreadsheetId: spreadsheetId,
+        range: "A:B",
+        valueInputOption: 'RAW',
+        insertDataOption: 'INSERT_ROWS',
+        resource: {
+          values: [
+            payload_expand(payload)
+          ],
+        },
+        auth: auth
+      }, (err, response) => {
+        if (err) return console.error(err)
+        else if(response){
+            console.log(`status is ${response.status}`);
+        }
+      })
 }
 /**
  * this will do authorization process
@@ -107,4 +125,36 @@ const filter_doc = (integration_arr, formId) => {
         }
     })
     return doc_body;
+}
+/**
+ * this will decode the payload
+ * @param {*} payload 
+ */
+const payload_expand = (payload) =>{
+    let value = [];
+    const sections = JSON.parse(payload).sections;
+    sections.map(s => {
+        s.map(f => {
+            if(!f['is_choice']){
+                value.push(f[Object.keys(f)[1]]);
+            }else{
+                value.push(get_choices(f[Object.keys(f)[1]]));
+            }
+        })
+    })
+
+    return value;
+}
+/**
+ * this will return the choices
+ * @param {*} obj 
+ */
+const get_choices = (obj) => {
+    var val = [];
+    for (var key in obj) {
+        if(obj[key]){
+            val.push(key);
+        }
+    }
+    return val.join();
 }
