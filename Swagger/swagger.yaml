@@ -258,6 +258,14 @@ paths:
           description: OK    
         404:
           description: Not Found
+  /get/all/consumers:
+    get:
+      summary: get all the consumers
+      responses:
+        200:
+          description: OK    
+        404:
+          description: Not Found        
   /update/consumers:
     put:
       summary: add the consumers attached to the form
