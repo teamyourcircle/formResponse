@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-var flag = true;
+var flag = false;
 const dataExtracter = (req, res, next) => {
     let responseSummary = {};
     let choiceresponseSummary = {};
@@ -44,7 +44,6 @@ const dataExtracter = (req, res, next) => {
             fetch(url).then( resp => resp.json())
             .then(data => {
                 const responses = data.responseArray;
-                console.log('Helllllooooo------------------', rp);
                 for(var i=0;i<responses.length;i++){
                     let sections = responses[i]['sections'];
                     sections.map(s => {
@@ -84,33 +83,4 @@ const validate_form_created_by_current_user  = (formsByUser, form_id) =>{
         return ;
     }
     return formsByUser.filter(form => form.form_id==form_id);
-}
-
-const check_already_sheet_present = (req, res, token) => {
-    const uri = "http://localhost:5000/auth/api/user/oauthApps";
-    const options = {
-        method: 'GET',
-        headers: {
-            'access-token': token,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    }
-    fetch(uri, options)
-    .then(res => res.json())
-    .then( data => {
-        if(data.msg){
-            return res.status(403).json({'msg':`err :: ${data.msg}`});
-        }
-        req.socialID = data["integartionList"][0]["social_id"];
-        var add_info = data["integartionList"][0]['additional_info'];
-        Object.keys(add_info).forEach( e => {
-            if(e == req.form.form_id) {
-                var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
-                return sheetUrl;
-            }
-        })
-        return false;
-    })
-    .catch(err => res.status(502).json({"msg": "Bad Gateway - " + err.message}));
 }
