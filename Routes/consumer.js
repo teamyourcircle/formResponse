@@ -2,7 +2,7 @@ const consumerSchema=require('../Model/consumerSchema');
 const express = require('express');
 const router=express.Router();
 const validate = require('../MiddleWareFun/validateFormAuthor');
-
+const consumers = require('../Consumers');
 
 router.get('/get/consumers',(req,res)=>{
     const {formId} = req.query;
@@ -11,12 +11,16 @@ router.get('/get/consumers',(req,res)=>{
         if(consumer)
             res.status(200).json(consumer);
         else
-            res.status(404).json({"msg":"not found error"});    
+            res.status(404).json({"queueName":[], "formId":parseInt(formId)});    
     })
     .catch(err =>{
         res.status(500).json({"msg":`internal error :: ${err}`})
     })
 
+})
+
+router.get('/get/all/consumers',(req,res)=>{
+    res.json(consumers);
 })
 
 router.put('/update/consumers', validate,(req,res)=>{
