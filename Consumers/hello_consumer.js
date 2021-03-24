@@ -15,11 +15,4 @@ open.then(function(conn) {
     });
   }).catch(console.warn);
 }
-<<<<<<< HEAD
-
-// module.exports = hello_consumer;
-
-hello_consumer("tasks")
-=======
 module.exports = hello_consumer;
->>>>>>> 32067d99a844cc31da886c2ef1d5743ab717fb3a
