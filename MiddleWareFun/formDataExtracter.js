@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-var flag = false;
 const dataExtracter = (req, res, next) => {
     let responseSummary = {};
     let choiceresponseSummary = {};
