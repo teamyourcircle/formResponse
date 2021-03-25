@@ -277,17 +277,7 @@ paths:
           description: OK    
         404:
           description: Not Found   
-  /register/consumers:
-    post:
-      summary: create a schema and add one consumer
-      parameters:
-        - $ref: '#/parameters/access_token'
-        - $ref: '#/parameters/consumer_queue_body'
-      responses:
-        200:
-          description: OK    
-        404:
-          description: Not Found        
+        
 definitions: 
   googleOauthClient:
     required:
