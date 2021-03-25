@@ -81,10 +81,11 @@ const validate_form_created_by_current_user  = (formsByUser, form_id) =>{
     return formsByUser.filter(form => form.form_id==form_id);
 }
 
-/* 
-    this function will find the already created sheet present in multi-account
-    @param{}
-*/
+/**
+ * this function will find the already created sheet present in multi-account
+ * @param {*} data 
+ */
+
 const already_create_sheet_checker = (data) => {
     data["integartionList"].forEach( eve => {
         var add_info = eve['additional_info'];
