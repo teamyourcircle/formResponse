@@ -25,29 +25,28 @@ router.get('/get/all/consumers',(req,res)=>{
 
 router.put('/update/consumers', validate,(req,res)=>{
     const {queueName,formId } = req.body;
-    consumerSchema.update({"formId": formId},{$push:{"queueName":queueName}})
-    .then(consumer =>{
-        res.status(200).json({"msg": "updated successfully"});
+    consumerSchema.findOne({formId})
+    .then(fetchedconsumer =>{
+        if(fetchedconsumer==null){
+            const queue = [queueName];
+            const consumer = new consumerSchema({
+                queueName: queue
+                ,formId
+            });
+            consumer.save().then(consumer => {
+                return res.status(200).json({"msg": "updated successfully"});
+            })
+        }else{
+            consumerSchema.update({"formId": formId},{$push:{"queueName":queueName}})
+            .then(consumer =>{
+            res.status(200).json({"msg": "updated successfully"});
+        })
+    }
+        
     })
     .catch(err =>{
         res.status(500).json({"msg":`internal error :: ${err}`})
     })
 })
 
-router.post('/register/consumers', validate,(req,res)=>{
-    const {queueName,formId } = req.body;
-    const queue = [queueName];
-    const consumer = new consumerSchema({
-        queueName: queue
-        ,formId
-    });
-    consumer.save().then(consumer => {
-        res.status(200).json(consumer);
-    })
-    .catch(err =>{
-        res.status(500).json({"msg":`internal error :: ${err}`})
-    })
-
-
-})
 module.exports = router;
