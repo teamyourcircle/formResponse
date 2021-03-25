@@ -45,7 +45,7 @@ router.put('/update/consumers', validate,(req,res)=>{
         
     })
     .catch(err =>{
-        res.status(500).json({"msg":`internal error :: ${err}`})
+        res.status(500).json({"err":`internal error :: ${err}`})
     })
 })
 
@@ -64,7 +64,7 @@ router.delete('/remove/consumers', validate,(req,res)=>{
         
     })
     .catch(err =>{
-        res.status(500).json({"msg":`internal error :: ${err}`})
+        res.status(500).json({"err":`internal error :: ${err}`})
     })
 })
 module.exports = router;

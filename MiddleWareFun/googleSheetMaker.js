@@ -10,6 +10,7 @@ buildRowsForData
 const integartion_id = "google-sheets";
 
 const googleSheetMaker = (req, res, next) => {
+  const form_id = req.form.form_id;
   const { client_id, client_secret, redirect_uri, supportive_email} = req.body;
   let spreadId = "";
   authorize(createSheet);
@@ -39,7 +40,6 @@ const googleSheetMaker = (req, res, next) => {
     sheets.spreadsheets.create({
       resource,
     }, (err, spreadsheet) =>{
-      console.log(err, spreadsheet);
       if (err) {
         /*
         * here may be access token is expired so we can refresh it 
@@ -72,7 +72,9 @@ const googleSheetMaker = (req, res, next) => {
             req.body.access_token = data.access_token;
             authorize(createSheet);
           })
-          .catch(err => res.status(401).json({'msg':`error : ${err}`}));
+          .catch(err => {
+            return res.status(500).json({'msg':`err :: ${err}`})
+          })
         }
       }else{
         return res.status(500).json({'msg':`error : ${err.message}`})
@@ -145,35 +147,44 @@ const googleSheetMaker = (req, res, next) => {
       }
     };
     //batch update request
-      sheets.spreadsheets.batchUpdate(request, function(err, response) {
+      sheets.spreadsheets.batchUpdate(request, async function(err, response) {
         if (err) {
-          return res.status(500).json({'msg':`error :: ${err}`})
+          console.log(`status is 502`);
+          req.response_from_google = {
+            status: 502,
+            error: err
+          }
+          next();
         }
         //final response
-        if(response.status==200){
-          set_the_consumer(integartion_id, req.form.form_id)
-          .then(()=>{
+        if(response!==undefined)
+        {
+          if(response.status==200){
+            console.log(`status is ${response.status}`);
+            const set_consumer = await set_the_consumer(integartion_id, form_id)
             req.response_from_google = {
-              url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
-              status: 200,
+                url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
+                status: 200,
+                source: response.request.responseURL
+            }
+            next();
+          }else{
+            console.log(`status is 502`);
+            req.response_from_google = {
+              status: 502,
+              error: response.statusText,
               source: response.request.responseURL
-            };
-          })
-          .catch(err => {
+            }
+            next();
+          }
+        }else{
+          console.log(`status is 500`);
             req.response_from_google = {
               status: 500,
-              error: err,
-          }
-          })
-        }else{
-          req.response_from_google = {
-            status: response.status,
-            error: response.statusText,
-            source: response.request.responseURL
-          }
+              error: 'no response from google',
+            }
+            next();
         }
-        
-        next()
       });
   }
  
@@ -186,28 +197,23 @@ module.exports = googleSheetMaker;
  * @param {*} queueName 
  * @param {*} formId 
  */
-const set_the_consumer = (queueName, formId) =>{
-    return new Promise((resolve, reject)=>{
-      fetch('http://localhost:5002/form/api/update/consumers', {
-        method: 'PUT',
-        headers: {
-          'access-token': req.headers['access-token'],
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body:JSON.stringify({
-          queueName,
-          formId
-        })
-      })
-      .then(res => res.status)
-      .then(status => {
-        if(status==200){
-          resolve();
-        }
-      })
-      .catch(err => {
-        reject(err);
+const set_the_consumer = async (queueName, formId) =>{
+    console.log('setting the consumer');
+    const res = await fetch('http://localhost:5002/form/api/update/consumers', {
+      method: 'PUT',
+      headers: {
+        'access-token': req.headers['access-token'],
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body:JSON.stringify({
+        queueName,
+        formId
       })
     })
+
+    const data = await res.json();
+    return ;
+    
+
 }
