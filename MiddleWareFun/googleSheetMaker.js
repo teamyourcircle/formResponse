@@ -7,6 +7,7 @@ buildHeaderRowRequest,
 buildRowsForData
 } = require('../util/create_sheet_helper');
 
+const integartion_id = "google-sheets";
 
 const googleSheetMaker = (req, res, next) => {
   const { client_id, client_secret, redirect_uri, supportive_email} = req.body;
@@ -38,6 +39,7 @@ const googleSheetMaker = (req, res, next) => {
     sheets.spreadsheets.create({
       resource,
     }, (err, spreadsheet) =>{
+      console.log(err, spreadsheet);
       if (err) {
         /*
         * here may be access token is expired so we can refresh it 
@@ -55,7 +57,7 @@ const googleSheetMaker = (req, res, next) => {
               'Accept': 'application/json'
             },
             body: JSON.stringify({"oauth_provider": "google",
-            "integration_id": "google-sheets"})
+            "integration_id": "google-sheets", "supportive_email": supportive_email})
           }
           fetch('http://localhost:5000/auth/api/refreshoauthAccess', option)
           .then(res => {
@@ -149,11 +151,20 @@ const googleSheetMaker = (req, res, next) => {
         }
         //final response
         if(response.status==200){
-          req.response_from_google = {
-            url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
-            status: 200,
-            source: response.request.responseURL
-          };
+          set_the_consumer(integartion_id, req.form.form_id)
+          .then(()=>{
+            req.response_from_google = {
+              url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
+              status: 200,
+              source: response.request.responseURL
+            };
+          })
+          .catch(err => {
+            req.response_from_google = {
+              status: 500,
+              error: err,
+          }
+          })
         }else{
           req.response_from_google = {
             status: response.status,
@@ -169,3 +180,34 @@ const googleSheetMaker = (req, res, next) => {
 }
 
 module.exports = googleSheetMaker;
+
+/**
+ * this will connect the automation consumer
+ * @param {*} queueName 
+ * @param {*} formId 
+ */
+const set_the_consumer = (queueName, formId) =>{
+    return new Promise((resolve, reject)=>{
+      fetch('http://localhost:5002/form/api/update/consumers', {
+        method: 'PUT',
+        headers: {
+          'access-token': req.headers['access-token'],
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body:JSON.stringify({
+          queueName,
+          formId
+        })
+      })
+      .then(res => res.status)
+      .then(status => {
+        if(status==200){
+          resolve();
+        }
+      })
+      .catch(err => {
+        reject(err);
+      })
+    })
+}

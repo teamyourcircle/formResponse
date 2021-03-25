@@ -49,4 +49,22 @@ router.put('/update/consumers', validate,(req,res)=>{
     })
 })
 
+router.delete('/remove/consumers', validate,(req,res)=>{
+    const {queueName,formId } = req.body;
+    consumerSchema.findOne({formId})
+    .then(fetchedconsumer =>{
+        if(fetchedconsumer==null){
+            return res.status(404).json({"msg": "not found error"});
+        }else{
+            consumerSchema.update({"formId": formId},{$pull:{"queueName":queueName}})
+            .then(consumer =>{
+            res.status(200).json({"msg": "removed successfully"});
+        })
+    }
+        
+    })
+    .catch(err =>{
+        res.status(500).json({"msg":`internal error :: ${err}`})
+    })
+})
 module.exports = router;

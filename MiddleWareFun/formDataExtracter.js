@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 const dataExtracter = (req, res, next) => {
     let responseSummary = {};
     let choiceresponseSummary = {};
+    var flag = false;
     const formObj = validate_form_created_by_current_user(req.formData, req.body.form_id);
     if(!formObj.length){
         return res.status(404).json({'msg':`form with form_id ${req.body.form_id} not exist`});
@@ -65,7 +66,7 @@ const dataExtracter = (req, res, next) => {
                 req.my_formData = {...responseSummary,...choiceresponseSummary};
                 next();
             })
-            .catch(err => res.status(502).json({"msg": "Bad Gateway - " + err.message}))
+            .catch(err => res.status(502).json({"msg": "Bad Gateway -- " + err.message}))
         }
     })
     .catch(err => res.status(502).json({"msg": "Bad Gateway - " + err.message}));

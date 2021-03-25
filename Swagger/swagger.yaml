@@ -276,7 +276,18 @@ paths:
         200:
           description: OK    
         404:
-          description: Not Found   
+          description: Not Found  
+  /remove/consumers:
+    delete:
+      summary: remove the consumers attached to the form
+      parameters:
+        - $ref: '#/parameters/access_token'
+        - $ref: '#/parameters/consumer_queue_body'
+      responses:
+        200:
+          description: OK    
+        404:
+          description: Not Found        
         
 definitions: 
   googleOauthClient:
