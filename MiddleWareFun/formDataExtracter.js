@@ -28,18 +28,11 @@ const dataExtracter = (req, res, next) => {
         if(data.msg){
             return res.status(403).json({'msg':`err :: ${data.msg}`});
         }
-        // req.socialID = data["integartionList"][0]["social_id"];
-        // var add_info = data["integartionList"][0]['additional_info'];
-        data["integartionList"].forEach( eve => {
-            var add_info = eve['additional_info'];
-            Object.keys(add_info).forEach( e => {
-                if(e == req.form.form_id) {
-                    var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
-                    flag=true;
-                    return res.json({'URL': sheetUrl, 'status': 200 });
-                }
-            })
-        })
+        var rjson = already_create_sheet_checker(data);
+        if(rjson.status == 200)
+            return res.json(rjson);
+        else
+            return data;
     })
     .then(rp => {
         if(!flag){
@@ -86,4 +79,22 @@ const validate_form_created_by_current_user  = (formsByUser, form_id) =>{
         return ;
     }
     return formsByUser.filter(form => form.form_id==form_id);
+}
+
+/* 
+    this function will find the already created sheet present in multi-account
+    @param{}
+*/
+const already_create_sheet_checker = (data) => {
+    data["integartionList"].forEach( eve => {
+        var add_info = eve['additional_info'];
+        Object.keys(add_info).forEach( e => {
+            if(e == req.form.form_id) {
+                var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
+                flag=true;
+                return {'URL': sheetUrl, 'status': 200 };
+            }
+        })
+    })
+    return {'status': 404};
 }
