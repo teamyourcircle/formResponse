@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
+var flag = false;
 const dataExtracter = (req, res, next) => {
     let responseSummary = {};
     let choiceresponseSummary = {};
-    var flag = false;
     const formObj = validate_form_created_by_current_user(req.formData, req.body.form_id);
     if(!formObj.length){
         return res.status(404).json({'msg':`form with form_id ${req.body.form_id} not exist`});
@@ -28,7 +28,7 @@ const dataExtracter = (req, res, next) => {
         if(data.msg){
             return res.status(403).json({'msg':`err :: ${data.msg}`});
         }
-        var rjson = already_create_sheet_checker(data);
+        var rjson = already_create_sheet_checker(req.form.form_id, data);
         if(rjson.status == 200)
             return res.json(rjson);
         else
@@ -86,20 +86,26 @@ const validate_form_created_by_current_user  = (formsByUser, form_id) =>{
  * @param {*} data 
  */
 
-const already_create_sheet_checker = (data) => {
+const already_create_sheet_checker = (formId, data) => {
+    let sheetUrl = "";
     data["integartionList"].forEach( eve => {
         var add_info = eve['additional_info'];
         if(add_info == undefined)
             return {'status': 404};
         else {
             Object.keys(add_info).forEach( e => {
-                if(e == req.form.form_id) {
-                    var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
+                if(e == formId) {
+                    sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
                     flag=true;
-                    return {'url': sheetUrl, 'status': 200 };
+                    return;
                 }
             });
+            if(flag)
+                return;
         }
     })
+    if(flag)
+        return {'url': sheetUrl, 'status': 200 };
+
     return {'status': 404};
 }
