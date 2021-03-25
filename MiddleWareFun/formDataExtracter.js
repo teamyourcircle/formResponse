@@ -88,13 +88,17 @@ const validate_form_created_by_current_user  = (formsByUser, form_id) =>{
 const already_create_sheet_checker = (data) => {
     data["integartionList"].forEach( eve => {
         var add_info = eve['additional_info'];
-        Object.keys(add_info).forEach( e => {
-            if(e == req.form.form_id) {
-                var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
-                flag=true;
-                return {'URL': sheetUrl, 'status': 200 };
-            }
-        })
+        if(add_info == undefined)
+            return {'status': 404};
+        else {
+            Object.keys(add_info).forEach( e => {
+                if(e == req.form.form_id) {
+                    var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
+                    flag=true;
+                    return {'url': sheetUrl, 'status': 200 };
+                }
+            });
+        }
     })
     return {'status': 404};
 }
