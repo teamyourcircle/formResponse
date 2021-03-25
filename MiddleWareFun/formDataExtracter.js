@@ -28,14 +28,17 @@ const dataExtracter = (req, res, next) => {
         if(data.msg){
             return res.status(403).json({'msg':`err :: ${data.msg}`});
         }
-        req.socialID = data["integartionList"][0]["social_id"];
-        var add_info = data["integartionList"][0]['additional_info'];
-        Object.keys(add_info).forEach( e => {
-            if(e == req.form.form_id) {
-                var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
-                flag=true;
-                return res.json({'URL': sheetUrl, 'status': 200 });
-            }
+        // req.socialID = data["integartionList"][0]["social_id"];
+        // var add_info = data["integartionList"][0]['additional_info'];
+        data["integartionList"].forEach( eve => {
+            var add_info = eve['additional_info'];
+            Object.keys(add_info).forEach( e => {
+                if(e == req.form.form_id) {
+                    var sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[e].spreadsheet_id}/edit#gid=${add_info[e].sheetId}`;
+                    flag=true;
+                    return res.json({'URL': sheetUrl, 'status': 200 });
+                }
+            })
         })
     })
     .then(rp => {
