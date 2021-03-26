@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-var flag = false;
+let flag = false;
 const dataExtracter = (req, res, next) => {
     let responseSummary = {};
     let choiceresponseSummary = {};
@@ -29,8 +29,10 @@ const dataExtracter = (req, res, next) => {
             return res.status(403).json({'msg':`err :: ${data.msg}`});
         }
         var rjson = already_create_sheet_checker(req.form.form_id, data);
-        if(rjson.status == 200)
+        if(rjson.status == 200) {
+            flag = true;
             return res.json(rjson);
+        }
         else
             return data;
     })
@@ -84,6 +86,7 @@ const validate_form_created_by_current_user  = (formsByUser, form_id) =>{
 /**
  * this function will find the already created sheet present in multi-account
  * @param {*} data 
+ * @param {*} form_id
  */
 
 const already_create_sheet_checker = (formId, data) => {
@@ -91,12 +94,12 @@ const already_create_sheet_checker = (formId, data) => {
     let local_flag = false;
     data["integartionList"].forEach(eve => {
         var add_info = eve['additional_info'];
-        if(add_info === undefined){
-        }
+        if(add_info === undefined)
+            return;
         else {
-            if(add_info[formId]===undefined){
-
-            }else{
+            if(add_info[formId]===undefined)
+                return;
+            else{
                 sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[formId].spreadsheet_id}/edit#gid=${add_info[formId].sheetId}`;
                 local_flag = true;
             }

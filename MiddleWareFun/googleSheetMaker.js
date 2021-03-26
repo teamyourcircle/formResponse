@@ -20,7 +20,7 @@ const googleSheetMaker = (req, res, next) => {
       client_secret,
       redirect_uri
     );
-    oAuth2Client.setCredentials({ "access_token": req.body.access_token});
+    oAuth2Client.setCredentials({ "refresh_token": req.body.refresh_token});
     callback(oAuth2Client);
   }
   function createSheet(auth) {
@@ -48,34 +48,34 @@ const googleSheetMaker = (req, res, next) => {
         * but if no access_token :: (!200) do nothing
         */
        if(err.response!=undefined){
-        if(err.response.status == 401){
-          const option = {
-            method: 'POST',
-            headers: {
-              'access-token': req.headers['access-token'],
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({"oauth_provider": "google",
-            "integration_id": "google-sheets", "supportive_email": supportive_email})
-          }
-          fetch('http://localhost:5000/auth/api/refreshoauthAccess', option)
-          .then(res => {
-            if(res.ok){
-              return res.json();
-            }
-            else{
-              throw new Error('Refresh token not available as Access-Token is not correct'); 
-            }
-          })
-          .then(data => {
-            req.body.access_token = data.access_token;
-            authorize(createSheet);
-          })
-          .catch(err => {
-            return res.status(500).json({'msg':`err :: ${err}`})
-          })
-        }
+        // if(err.response.status == 401){
+        //   const option = {
+        //     method: 'POST',
+        //     headers: {
+        //       'access-token': req.headers['access-token'],
+        //       'Content-Type': 'application/json',
+        //       'Accept': 'application/json'
+        //     },
+        //     body: JSON.stringify({"oauth_provider": "google",
+        //     "integration_id": "google-sheets", "supportive_email": supportive_email})
+        //   }
+        //   fetch('http://localhost:5000/auth/api/refreshoauthAccess', option)
+        //   .then(res => {
+        //     if(res.ok){
+        //       return res.json();
+        //     }
+        //     else{
+        //       throw new Error('Refresh token not available as Access-Token is not correct'); 
+        //     }
+        //   })
+        //   .then(data => {
+        //     req.body.access_token = data.access_token;
+        //     authorize(createSheet);
+        //   })
+        //   .catch(err => {
+        //     return res.status(500).json({'msg':`err :: ${err}`})
+        //   })
+        // }
       }else{
         return res.status(500).json({'msg':`error : ${err.message}`})
       }
@@ -161,7 +161,7 @@ const googleSheetMaker = (req, res, next) => {
         {
           if(response.status==200){
             console.log(`status is ${response.status}`);
-            const set_consumer = await set_the_consumer(integartion_id, form_id)
+            const set_consumer = await set_the_consumer(req.headers['access-token'], integartion_id, form_id)
             req.response_from_google = {
                 url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
                 status: 200,
@@ -197,12 +197,12 @@ module.exports = googleSheetMaker;
  * @param {*} queueName 
  * @param {*} formId 
  */
-const set_the_consumer = async (queueName, formId) =>{
+const set_the_consumer = async (token, queueName, formId) =>{
     console.log('setting the consumer');
     const res = await fetch('http://localhost:5002/form/api/update/consumers', {
       method: 'PUT',
       headers: {
-        'access-token': req.headers['access-token'],
+        'access-token': token,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },

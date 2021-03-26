@@ -78,7 +78,7 @@ const authorize = (callback, formId, integration_id,payload) => {
     );
     set_integration_doc(formId,integration_id)
     .then(() => {
-        oAuth2Client.setCredentials({ "access_token": document_info['access_token']});
+        oAuth2Client.setCredentials({ "refresh_token": document_info['refresh_token']});
         callback(oAuth2Client,payload);
     })
     .catch(err =>{
@@ -87,7 +87,7 @@ const authorize = (callback, formId, integration_id,payload) => {
 }
 
 /**
- * this will set sheetId , spreadsheetid , access_token
+ * this will set sheetId , spreadsheetid , refreshtoken
  * @param {*} formId 
  * @param {*} integrationId 
  */
@@ -119,7 +119,7 @@ const filter_doc = (integration_arr, formId) => {
     integration_arr.map(i => {
         if(i['additional_info']!=undefined && i['additional_info'][formId]!=undefined)
         {   
-            doc_body['access_token'] = i['access_token'];
+            doc_body['refresh_token'] = i['refresh_token'];
             doc_body['spreadsheet_id'] = i['additional_info'][formId]['spreadsheet_id'];
             doc_body['sheetId'] = i['additional_info'][formId]['sheetId'];
         }
@@ -142,7 +142,6 @@ const payload_expand = (payload) =>{
             }
         })
     })
-
     return value;
 }
 /**

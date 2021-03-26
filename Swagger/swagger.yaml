@@ -125,7 +125,7 @@ paths:
           description: Unexpected error
   /oauth/createSheets:
     post:
-      summary: "Create Google SpreadSheet by giving ClientID, ClientSecret, RedirectURL and Access-token"
+      summary: "Create Google SpreadSheet by giving ClientID, ClientSecret, RedirectURL and Refresh-token"
       parameters:
         - $ref: '#/parameters/access_token'
         - in: body
@@ -296,7 +296,7 @@ definitions:
       - client_secret
       - redirect_uri
       - form_id
-      - access_token
+      - refresh_token
       - supportive_email
     properties:
       client_id:
@@ -311,9 +311,9 @@ definitions:
         description: google redirect uri
       form_id:
         type: string
-      access_token:
+      refresh_token:
         type: string
-        description: google access_token
+        description: google refresh_token
       supportive_email:
         type: string
         description: Supportive email address
