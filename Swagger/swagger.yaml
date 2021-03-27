@@ -43,6 +43,7 @@ paths:
     delete:
       summary: Delete the form-template as well as form-responses by id
       parameters:
+        - $ref: '#/parameters/access_token'
         - in: query
           name: key
           required: false
