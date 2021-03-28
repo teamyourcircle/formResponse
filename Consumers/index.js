@@ -22,7 +22,7 @@ module.exports = [
         actions: ["add the new row in connected spreadsheet"],
         name: "google_sheet_consumer",
         display_name: "Google Sheet",
-        authRequired: false,
+        authRequired: true,
         feature_flag: true,
         logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Google_Sheets_logo.svg",
         description: "on incoming new response we will create a new row in connected spreadsheet"

@@ -3,19 +3,21 @@ const express = require('express');
 const router=express.Router();
 const validate = require('../MiddleWareFun/validateFormAuthor');
 const consumers = require('../Consumers');
+const fetch = require('node-fetch');
 
-router.get('/get/consumers',(req,res)=>{
+router.get('/get/consumers',async (req,res)=>{
     const {formId} = req.query;
     consumerSchema.findOne({formId})
-    .then(consumer=>{
+    .then(async (consumer)=>{
         if(consumer){
-            let infos = [];
+            var infos = [];
             let res_body = {};
-            consumer.queueName.map(c=>{
-                infos.push(get_info_for_consumer(c));
-            })
-            res_body.infos = infos;
-            res_body.queueName = consumer.queueName;
+            for(let i=0;i<consumer.queueName.length;i++){
+                let info_for_consumer = await get_info_for_consumer(consumer.queueName[i],req.headers['access-token']);
+                infos.push(info_for_consumer);
+                res_body.infos = infos;
+                res_body.queueName = consumer.queueName;
+            }
             res.status(200).json(res_body);
         }
         else
@@ -81,10 +83,35 @@ module.exports = router;
  * this will return the logo
  * @param {*} queueName 
  */
-const get_info_for_consumer = (queueName) =>{
-    let consumerInfo =  consumers.filter(c => c.queue===queueName);
+const get_info_for_consumer = async (queueName,token) =>{
+    var consumerInfo =  consumers.filter(c => c.queue===queueName);
     if(consumerInfo.length){
+        //consumerInfo[0].emails = getSupportiveEmails(queueName,token);
+        let data = await getSupportiveEmails(queueName,token);
+        let integration_list = data.integartionList;
+        let emails = [];
+        if(integration_list){
+            for(let i=0;i<integration_list.length;i++){
+                let {email} = integration_list[i];
+                emails.push(email);
+            }
+        }
+        consumerInfo[0].emails = emails;
         return consumerInfo[0];
     }
     return null;
+}
+/**
+ * 
+ * @param {*} consumer 
+ */
+const getSupportiveEmails = (consumer,token) => {
+    return fetch(`http://localhost:5000/auth/api/user/oauthApps/byIntegrationId?integration_id=${consumer}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type':'application/json',
+                'access-token':`${token}`    
+            }
+        })
+        .then(res =>{return res.json()})    
 }
