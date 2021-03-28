@@ -8,8 +8,16 @@ router.get('/get/consumers',(req,res)=>{
     const {formId} = req.query;
     consumerSchema.findOne({formId})
     .then(consumer=>{
-        if(consumer)
-            res.status(200).json(consumer);
+        if(consumer){
+            let infos = [];
+            let res_body = {};
+            consumer.queueName.map(c=>{
+                infos.push(get_info_for_consumer(c));
+            })
+            res_body.infos = infos;
+            res_body.queueName = consumer.queueName;
+            res.status(200).json(res_body);
+        }
         else
             res.status(404).json({"queueName":[], "formId":parseInt(formId)});    
     })
@@ -68,3 +76,15 @@ router.delete('/remove/consumers', validate,(req,res)=>{
     })
 })
 module.exports = router;
+
+/**
+ * this will return the logo
+ * @param {*} queueName 
+ */
+const get_info_for_consumer = (queueName) =>{
+    let consumerInfo =  consumers.filter(c => c.queue===queueName);
+    if(consumerInfo.length){
+        return consumerInfo[0];
+    }
+    return null;
+}
