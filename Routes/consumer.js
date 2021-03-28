@@ -13,7 +13,7 @@ router.get('/get/consumers',async (req,res)=>{
             var infos = [];
             let res_body = {};
             for(let i=0;i<consumer.queueName.length;i++){
-                let info_for_consumer = await get_info_for_consumer(consumer.queueName[i],req.headers['access-token']);
+                let info_for_consumer = await get_info_for_consumer(consumer.queueName[i],req.headers['access-token'],formId);
                 infos.push(info_for_consumer);
                 res_body.infos = infos;
                 res_body.queueName = consumer.queueName;
@@ -83,20 +83,25 @@ module.exports = router;
  * this will return the logo
  * @param {*} queueName 
  */
-const get_info_for_consumer = async (queueName,token) =>{
+const get_info_for_consumer = async (queueName,token,formId) =>{
     var consumerInfo =  consumers.filter(c => c.queue===queueName);
     if(consumerInfo.length){
         //consumerInfo[0].emails = getSupportiveEmails(queueName,token);
         let data = await getSupportiveEmails(queueName,token);
         let integration_list = data.integartionList;
         let emails = [];
+        let active_email = '';
         if(integration_list){
             for(let i=0;i<integration_list.length;i++){
-                let {email} = integration_list[i];
+                let {email,additional_info} = integration_list[i];
                 emails.push(email);
+                if(additional_info && additional_info[formId]){
+                    active_email = email;
+                }
             }
         }
         consumerInfo[0].emails = emails;
+        consumerInfo[0].active_email = active_email;
         return consumerInfo[0];
     }
     return null;
