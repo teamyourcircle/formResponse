@@ -55,17 +55,15 @@ router.delete('/forms/delete',dashHit,(req,res)=>{
             consumerSchema.deleteOne({"formId":formId}).then(result=>{
               res.status(200).json({status:"Deleted"});
             })
-  
           })
-         
         });
       } else {
-          res.status(response.status).json({status:response.status});
+          res.status(response.status).json({msg:"not found"});
         }
     }
   )
   .catch(function(err) {
-    res.status(500).json('Internal error');
+    res.status(500).json({msg:"internal server error"});
   });
   });
 
