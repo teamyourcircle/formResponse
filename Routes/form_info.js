@@ -50,21 +50,21 @@ router.delete('/forms/delete',dashHit,(req,res)=>{
   .then(
     function(response) {
       if (response.ok) {
-        response.json().then(async function(data) {
-          const resData = await respSchema.deleteMany({"formId":formId});
-          const consumerData = await consumerSchema.deleteMany({"formId":formId})
-        res.status(200).json({status:"Deleted"});
+        response.json().then(function(data) {
+          respSchema.deleteMany({"formId":formId}).then(result=>{
+            consumerSchema.deleteOne({"formId":formId}).then(result=>{
+              res.status(200).json({status:"Deleted"});
+            })
+  
+          })
+         
         });
       } else {
           res.status(response.status).json({status:response.status});
         }
-
-     
-      
     }
   )
   .catch(function(err) {
-      console.log(err);
     res.status(500).json('Internal error');
   });
   });
