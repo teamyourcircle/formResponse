@@ -262,6 +262,12 @@ paths:
   /get/all/consumers:
     get:
       summary: get all the consumers
+      parameters: 
+        - in: query
+          name: tags
+          required: false
+          type: string
+          description: mention tags separated with comma
       responses:
         200:
           description: OK    

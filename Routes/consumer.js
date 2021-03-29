@@ -29,10 +29,6 @@ router.get('/get/consumers',async (req,res)=>{
 
 })
 
-router.get('/get/all/consumers',(req,res)=>{
-    res.json(consumers);
-})
-
 router.put('/update/consumers', validate,(req,res)=>{
     const {queueName,formId } = req.body;
     consumerSchema.findOne({formId})
@@ -77,6 +73,18 @@ router.delete('/remove/consumers', validate,(req,res)=>{
         res.status(500).json({"err":`internal error :: ${err}`})
     })
 })
+
+router.get('/get/all/consumers',(req,res)=>{
+    const {tags} = req.query;
+    if(!tags){
+        res.json(consumers);
+    }else{
+        const tagsArr = tags.split(',');
+        res.json(get_consumers_by_tag(tagsArr));
+    }
+
+})
+
 module.exports = router;
 
 /**
@@ -119,4 +127,33 @@ const getSupportiveEmails = (consumer,token) => {
             }
         })
         .then(res =>{return res.json()})    
+}
+
+/**
+ * get consumers by tags(array)
+ * @param {*} tags 
+ */
+const get_consumers_by_tag = (tagsArray) => {
+    let selectedConsumer = [];
+    for(let i=0;i<consumers.length;i++){
+        let {tags} = consumers[i]; 
+        for(let j=0;j<tagsArray.length;j++){
+            if(contains(tagsArray[j],tags)){
+                selectedConsumer.push(consumers[i]);
+                break;
+            }
+        }
+    }
+    return selectedConsumer;
+}
+/**
+ * tag represent a single tag return true if present in tags array
+ * @param {*} tag 
+ * @param {*} tags 
+ */
+const contains = (tag, tags) => {
+    if(tags.indexOf(tag)===-1){
+        return false;
+    }
+    return true;
 }
