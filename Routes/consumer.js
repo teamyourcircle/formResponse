@@ -17,8 +17,12 @@ router.get('/get/consumers',async (req,res)=>{
                 infos.push(info_for_consumer);
                 res_body.infos = infos;
                 res_body.queueName = consumer.queueName;
+                res_body.formId = parseInt(formId);
             }
-            res.status(200).json(res_body);
+            if(res_body.queueName)
+            return res.status(200).json(res_body);
+            else
+            return res.status(200).json({queueName: [], formId});
         }
         else
             res.status(404).json({"queueName":[], "formId":parseInt(formId)});    
@@ -26,7 +30,6 @@ router.get('/get/consumers',async (req,res)=>{
     .catch(err =>{
         res.status(500).json({"msg":`internal error :: ${err}`})
     })
-
 })
 
 router.put('/update/consumers', validate,(req,res)=>{
