@@ -7,6 +7,7 @@ const helper = require('./helper');
 const dashHit = require('../MiddleWareFun/dashboardHit');
 const dataXT = require('../MiddleWareFun/formDataExtracter');
 const GSheet = require('../MiddleWareFun/googleSheetMaker');
+const Switch = require('../MiddleWareFun/switcher');
 
 router.get('/myforms',async (req,res)=>{
     const {key} = req.query;
@@ -158,6 +159,10 @@ router.delete("/delete/response",[dashHit], async (req, res) => {
   else
     return res.status(response.status).json({"msg":"Form not found"});
 });
+
+router.put("/put/switch", [Switch], (req, res) => {
+  return res.status(200).json({status:"Switched"});
+})
 
 
 module.exports = router;
