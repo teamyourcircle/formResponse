@@ -15,7 +15,11 @@ const switcher_to = (req, res, next) => {
     fetch(url, options)
     .then(resp => resp.json())
     .then( data => {
+        if(data["integartionList"] == undefined)
+            return res.status(404).json({'msg': 'Data not found'});
         data["integartionList"].forEach(ele => {
+            if(ele.email == undefined)
+                return res.status(404).json({'msg': 'supportive email is not found'});
             if(ele.email == req.body.switch_to)
                 req.switch_to = ele;
             if(ele.email == req.body.switch_from)
@@ -44,30 +48,27 @@ const switcher_to = (req, res, next) => {
         fetch(uri, option)
         .then(resp => resp.json())
         .then( data => {
-            
-        })
-        .catch( err => res.status(400).json({'msg' : `error : : ${err}`}))
-
-        const uri_from = `http://localhost:5000/auth/api/oauth/edit/remove/${integ_id}`;
-        const option_from = {
-            method: 'PUT',
-            headers: {
-                'access-token': token,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'supportive_email': req.body.switch_from,
-            },
-            body:JSON.stringify({
-                "property" : formId
+            const uri_from = `http://localhost:5000/auth/api/oauth/edit/remove/${integ_id}`;
+            const option_from = {
+                method: 'PUT',
+                headers: {
+                    'access-token': token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'supportive_email': req.body.switch_from,
+                },
+                body:JSON.stringify({
+                    "property" : formId
+                })
+            }
+            fetch(uri_from, option_from)
+            .then( data => {
+                next();
             })
-        }
-        fetch(uri_from, option_from)
-        .then( data => {
-
+            .catch( err => res.status(400).json({'msg' : `error : : ${err}`}))
         })
         .catch( err => res.status(400).json({'msg' : `error : : ${err}`}))
     })
     .catch(err => res.status(400).json({'msg' : `error : : ${err}`}));
-    next();
 }
 module.exports = switcher_to;
