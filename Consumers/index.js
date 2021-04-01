@@ -7,8 +7,10 @@ module.exports = [
         queue: "hello",
         consumer: require('./hello_consumer'),
         tags: ["hello","test"] ,
+        actions: ["print the new response payload to console"],
         name: "hello_consumer",
         display_name: "Hello Consumer",
+        authRequired: false,
         feature_flag: true,
         logo: "https://i.ibb.co/DY0Zc25/android-chrome-512x512.png",
         description: `this is for testing purpose so if any form linked with this consumer's queue ,then on new response that response payload is shown on console`
@@ -17,8 +19,10 @@ module.exports = [
         queue: "google-sheets",
         consumer: require('./google_sheet'),
         tags: ["google","sheet"] ,
+        actions: ["add the new row in connected spreadsheet"],
         name: "google_sheet_consumer",
         display_name: "Google Sheet",
+        authRequired: true,
         feature_flag: true,
         logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Google_Sheets_logo.svg",
         description: "on incoming new response we will create a new row in connected spreadsheet"

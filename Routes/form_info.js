@@ -1,5 +1,6 @@
 
 const respSchema=require('../Model/responseSchema');
+const consumerSchema= require('../Model/consumerSchema')
 const express = require('express');
 const router=express.Router();
 const fetch = require('node-fetch');
@@ -43,22 +44,28 @@ router.get('/myforms',async (req,res)=>{
 })
 
                                               
-router.delete('/forms/delete', async(req,res)=>{
+router.delete('/forms/delete',dashHit,(req,res)=>{
     const formId = req.body.formId;
-  try {
-    let response = await fetch(`http://localhost:8000/forms/delete/${formId}`);
-    if (response.ok) {
-    let json = await response.json();
-    const resultData = await respSchema.deleteMany({"formId":formId});
-    res.status(200).json({status:"Deleted"});
-    } else {
-      res.status(response.status).json({status:response.status});
+ 
+  fetch(`http://localhost:8000/forms/delete/${formId}`)
+  .then(
+    function(response) {
+      if (response.ok) {
+        response.json().then(function(data) {
+          respSchema.deleteMany({"formId":formId}).then(result=>{
+            consumerSchema.deleteOne({"formId":formId}).then(result=>{
+              res.status(200).json({status:"Deleted"});
+            })
+          })
+        });
+      } else {
+          res.status(response.status).json({msg:"not found"});
+        }
     }
-    
-  } catch (err) {
-    console.log(err);
-    res.status(500).json('Internal error');
-  }
+  )
+  .catch(function(err) {
+    res.status(500).json({msg:"internal server error"});
+  });
   });
 
 //get all the responses by form_id test
