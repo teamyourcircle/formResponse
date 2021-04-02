@@ -108,6 +108,7 @@ const get_info_for_consumer = async (queueName,token,formId) =>{
                 emails.push(email);
                 if(additional_info && additional_info[formId] && !additional_info[formId].deleted){
                     active_email = email;
+                    additional_info_form = additional_info[formId];
                 }
             }
         }

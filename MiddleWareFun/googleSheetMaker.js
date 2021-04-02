@@ -60,9 +60,12 @@ const googleSheetMaker = (req, res, next) => {
         .then(res => res.json())
         .then(async (data) => {
           publisher.publish("buildSheet",JSON.stringify({spreadsheet_id,sheetId,my_formData:req.my_formData,client_id, client_secret, redirect_uri,refresh_token}));
-          const set_consumer = await set_the_consumer(req.headers['access-token'], integration_id, form_id)
           req.response_from_google = {
             url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
+            sheet_info: {
+              spreadsheet_id,
+              sheetId
+            },
             status: 200
           }
         next();
@@ -76,26 +79,3 @@ const googleSheetMaker = (req, res, next) => {
 }
 
 module.exports = googleSheetMaker;
-
-/**
- * this will connect the automation consumer
- * @param {*} queueName 
- * @param {*} formId 
- */
-const set_the_consumer = async (token, queueName, formId) =>{
-    console.log('setting the consumer');
-    const res = await fetch('http://localhost:5002/form/api/update/consumers', {
-      method: 'PUT',
-      headers: {
-        'access-token': token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body:JSON.stringify({
-        queueName,
-        formId
-      })
-    })
-    const data = await res.json();
-    return ;
-}
