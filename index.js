@@ -10,6 +10,10 @@ const port = process.env.port || 5002;
 const uri = process.env.URI ;
 const consumers = require('./Consumers');
 var socket = require('socket.io');
+const redis = require('redis');
+const subscriber = redis.createClient();
+const busses = require('./Subscribers');
+const filter_function_by_busname = require('./Subscribers/subscriber');
 var server = app.listen(port, function(){
     console.log(`listening for requests on port ${port}`);
 });
@@ -35,7 +39,9 @@ const socketHandlerMiddleware = (req,res,next) => {
 app.use('/api', [socketHandlerMiddleware,formRoute]);
 app.use('/form/developer',swaggerRoute);
 
-// const client = MongoClient(uri);
+/*
+*starting mongo client
+*/
 mongoose.connect( uri, {
     useNewUrlParser:true, useUnifiedTopology: true
 }, () => {
@@ -65,3 +71,17 @@ io.on("connection", socket => {
     })
 
 })
+
+/*
+* running the functionality on new message
+*/
+subscriber.on("message",function(channel,msg){
+    filter_function_by_busname(channel,msg);
+  }); 
+/*
+* subscribing the channels
+*/
+busses.map(b => {
+    subscriber.subscribe(b.bus_name);
+})
+

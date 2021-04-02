@@ -43,6 +43,7 @@ paths:
     delete:
       summary: Delete the form-template as well as form-responses by id
       parameters:
+        - $ref: '#/parameters/access_token'
         - in: query
           name: key
           required: false
@@ -261,6 +262,12 @@ paths:
   /get/all/consumers:
     get:
       summary: get all the consumers
+      parameters: 
+        - in: query
+          name: tags
+          required: false
+          type: string
+          description: mention tags separated with comma
       responses:
         200:
           description: OK    

@@ -117,7 +117,7 @@ const set_integration_doc = (formId,integrationId)=>{
 const filter_doc = (integration_arr, formId) => {
     let doc_body = {};
     integration_arr.map(i => {
-        if(i['additional_info']!=undefined && i['additional_info'][formId]!=undefined)
+        if(i['additional_info']!=undefined && i['additional_info'][formId]!=undefined && !i['additional_info'][formId].deleted)
         {   
             doc_body['refresh_token'] = i['refresh_token'];
             doc_body['spreadsheet_id'] = i['additional_info'][formId]['spreadsheet_id'];

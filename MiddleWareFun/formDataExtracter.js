@@ -28,7 +28,7 @@ const dataExtracter = (req, res, next) => {
         if(data.msg){
             return res.status(403).json({'msg':`err :: ${data.msg}`});
         }
-        var rjson = already_create_sheet_checker(req.form.form_id, data);
+        var rjson = already_create_sheet_checker(req.form.form_id, data,req.body.supportive_email);
         if(rjson.status == 200) {
             flag = true;
             return res.json(rjson);
@@ -89,24 +89,23 @@ const validate_form_created_by_current_user  = (formsByUser, form_id) =>{
  * @param {*} form_id
  */
 
-const already_create_sheet_checker = (formId, data) => {
+const already_create_sheet_checker = (formId, data,supportive_email) => {
     let sheetUrl = '';
+    let sheetInfo = {};
     let local_flag = false;
     data["integartionList"].forEach(eve => {
         var add_info = eve['additional_info'];
-        if(add_info === undefined)
+        if(add_info && add_info[formId] && eve.email===supportive_email){
+            sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[formId].spreadsheet_id}/edit#gid=${add_info[formId].sheetId}`;
+            sheetInfo.spreadsheet_id = add_info[formId].spreadsheet_id;
+            sheetInfo.sheetInfo = add_info[formId].sheetId;
+            local_flag = true;
+        }else{
             return;
-        else {
-            if(add_info[formId]===undefined)
-                return;
-            else{
-                sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[formId].spreadsheet_id}/edit#gid=${add_info[formId].sheetId}`;
-                local_flag = true;
-            }
         }
     })
     if(local_flag)
-        return {'url': sheetUrl, 'status': 200 ,'source': 'already_created'};
+        return {'url': sheetUrl, 'sheet_info':sheetInfo,'status': 200 ,'source': 'already_created'};
     else
         return {'status': 404};
 }
