@@ -62,6 +62,10 @@ const googleSheetMaker = (req, res, next) => {
           publisher.publish("buildSheet",JSON.stringify({spreadsheet_id,sheetId,my_formData:req.my_formData,client_id, client_secret, redirect_uri,refresh_token}));
           req.response_from_google = {
             url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
+            sheet_info: {
+              spreadsheet_id,
+              sheetId
+            },
             status: 200
           }
         next();
