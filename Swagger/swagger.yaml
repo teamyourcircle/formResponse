@@ -295,7 +295,7 @@ paths:
           description: OK    
         404:
           description: Not Found
-  /put/switch:
+  /put/switch/{integrationId}:
     put:
       summary: Switch your access to another account
       parameters:
@@ -306,7 +306,7 @@ paths:
           schema: 
             $ref: '#/definitions/switch'
         - in: path
-          name: integration_id
+          name: integrationId
           required: true
           enum: 
             - google-sheets

@@ -167,8 +167,8 @@ router.delete("/delete/response",[dashHit], async (req, res) => {
     return res.status(response.status).json({"msg":"Form not found"});
 });
 
-router.put("/put/switch", [Switcher], (req, res) => {
-  return res.status(200).json({'msg':"Switched"});
+router.put("/put/switch/:integrationId", [Switcher], (req, res) => {
+  return res.status(200).json({'msg':"switched"});
 })
 
 
