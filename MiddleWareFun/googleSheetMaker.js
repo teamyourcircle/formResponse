@@ -66,6 +66,7 @@ const googleSheetMaker = (req, res, next) => {
               spreadsheet_id,
               sheetId
             },
+            supportive_email,
             status: 200
           }
         next();
