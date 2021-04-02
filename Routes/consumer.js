@@ -106,8 +106,9 @@ const get_info_for_consumer = async (queueName,token,formId) =>{
             for(let i=0;i<integration_list.length;i++){
                 let {email,additional_info} = integration_list[i];
                 emails.push(email);
-                if(additional_info && additional_info[formId]){
+                if(additional_info && additional_info[formId] && !additional_info[formId].deleted){
                     active_email = email;
+                    additional_info_form = additional_info[formId];
                 }
             }
         }
