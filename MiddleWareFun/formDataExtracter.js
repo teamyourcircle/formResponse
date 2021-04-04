@@ -105,7 +105,7 @@ const already_create_sheet_checker = (formId, data,supportive_email) => {
         }
     })
     if(local_flag)
-        return {'url': sheetUrl, 'sheet_info':sheetInfo,'status': 200 ,supportive_email: req.body.supportive_email,'source': 'already_created'};
+        return {'url': sheetUrl, 'sheet_info':sheetInfo,'status': 200 ,supportive_email: supportive_email,'source': 'already_created'};
     else
         return {'status': 404};
 }
