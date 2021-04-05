@@ -53,8 +53,7 @@ const googleSheetMaker = (req, res, next) => {
           },
           body:JSON.stringify({[req.form.form_id]: {
             spreadsheet_id,
-            sheetId,
-            deleted: false
+            sheetId          
           }})
         })
         .then(res => res.json())
@@ -66,6 +65,7 @@ const googleSheetMaker = (req, res, next) => {
               spreadsheet_id,
               sheetId
             },
+            supportive_email,
             status: 200
           }
         next();
