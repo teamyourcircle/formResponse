@@ -1,14 +1,14 @@
 
-const respSchema=require('../Model/responseSchema');
-const consumerSchema= require('../Model/consumerSchema')
+const respSchema=require('../models/responseSchema');
+const consumerSchema= require('../models/consumerSchema')
 const express = require('express');
 const router=express.Router();
 const fetch = require('node-fetch');
 const helper = require('./helper');
-const dashHit = require('../MiddleWareFun/dashboardHit');
-const dataXT = require('../MiddleWareFun/formDataExtracter');
-const GSheet = require('../MiddleWareFun/googleSheetMaker');
-const Switcher = require('../MiddleWareFun/switcher');
+const dashHit = require('../middleWareFun/dashboardHit');
+const dataXT = require('../middleWareFun/formDataExtracter');
+const GSheet = require('../middleWareFun/googleSheetMaker');
+const Switcher = require('../middleWareFun/switcher');
 
 router.get('/myforms',async (req,res)=>{
     const {key} = req.query;

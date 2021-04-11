@@ -1,19 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const swaggerRoute = require('./Swagger/swagger');
-const formInforoute = require('./Routes/form_info');
-const consumerInfoRoute = require('./Routes/consumer');
+const swaggerRoute = require('./swagger/swagger');
+const formInforoute = require('./routes/form_info');
+const consumerInfoRoute = require('./routes/consumer');
 const cors = require('cors');
 const app = express();
-const formRoute = require('./Routes/routes');
+const formRoute = require('./routes/routes');
 const port = process.env.port || 5002;
 const uri = process.env.URI ;
-const consumers = require('./Consumers');
+const consumers = require('./consumers');
 var socket = require('socket.io');
 const redis = require('redis');
 const subscriber = redis.createClient();
-const busses = require('./Subscribers');
-const filter_function_by_busname = require('./Subscribers/subscriber');
+const busses = require('./subscribers');
+const filter_function_by_busname = require('./subscribers/subscriber');
 var server = app.listen(port, function(){
     console.log(`listening for requests on port ${port}`);
 });
@@ -25,7 +25,7 @@ const io = socket(server, {
 app.use(cors());
 //tester middleware
 app.use(express.json());
-const testFun = require('./MiddleWareFun/auth');
+const testFun = require('./middleWareFun/auth');
 app.use(testFun);
 app.use('/form/api',[formInforoute,consumerInfoRoute]);
 
@@ -65,11 +65,6 @@ io.on("connection", socket => {
     console.log('join the room :: '+room);
       socket.join(room);
     })
-
-    socket.on('disconnect', () =>{
-        console.log('client disconnected');
-    })
-
 })
 
 /*
