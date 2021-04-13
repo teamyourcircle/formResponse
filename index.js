@@ -10,7 +10,7 @@ const busses = require('./subscribers');
 const filter_function_by_busname = require('./subscribers/subscriber');
 const logger = require('./util/logger');
 const globalConstant = require('./util/globalConstant');
-
+const formRoute = require('./routes/response');
 /**
  * start the server
  */
@@ -64,4 +64,17 @@ subscriber.on(globalConstant.MESSAGE,function(channel,msg){
 busses.map(b => {
     subscriber.subscribe(b.bus_name);
 })
-
+/**
+ * this will emit the message on new response
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+const socketHandlerMiddleware = (req,res,next) => {
+    if(req.method=='POST'){
+        const roomId = req.body.form_id;  
+        io.to(roomId).emit('new-response');
+    }
+    next();
+}
+app.use('/api', [socketHandlerMiddleware,formRoute]);

@@ -12,6 +12,14 @@ exports.getResponse = (msg,statusCode) => {
     }
 }
 
+exports.createUrl = (baseUrl,path) => {
+  if(baseUrl && path){
+    return baseUrl+path;
+  }else{
+    return '';
+  }
+}
+
 exports.check_for_required_labels  = (fields,labels) => {
   
   for(let i=0;i<fields.length;i++){

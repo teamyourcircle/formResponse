@@ -2,6 +2,7 @@ var open = require('amqplib').connect('amqp://localhost:5672');
 var env = require('../config/config')['development']
 const {google} = require('googleapis');
 const fetch = require('node-fetch');
+const logger = require('../util/logger');
 const sheets = google.sheets('v4')
 
 const google_sheet = async (queue, isNoAck = false, durable = false, prefetch = null) => {
@@ -12,7 +13,7 @@ open.then(function(conn) {
     return ch.assertQueue(queue).then(function() {
       return ch.consume(queue, function(msg) {
         if (msg !== null) {
-          console.log(`recieving payload from the queue :: ${queue}`);
+          logger.debug(`recieving payload from the queue :: ${queue}`);
           prepare_the_auth_sheet(queue, msg.content.toString());
           ch.ack(msg);
         }
@@ -46,9 +47,9 @@ const add_row_to_sheet = (auth,payload) =>{
         },
         auth: auth
       }, (err, response) => {
-        if (err) return console.error(err)
+        if (err) return 
         else if(response){
-            console.log(`status is ${response.status}`);
+            
         }
       })
 }
