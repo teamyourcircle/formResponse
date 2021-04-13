@@ -1,7 +1,7 @@
 const express = require('express');
-const respSchema=require('../Model/responseSchema');
+const respSchema=require('../models/responseSchema');
 const router=express.Router();
-const producer = require('../MiddleWareFun/producer');
+const producer = require('../middleWareFun/producer');
 const fetch = require('node-fetch');
 
 router.use(express.json());

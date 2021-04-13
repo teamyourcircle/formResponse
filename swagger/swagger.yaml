@@ -12,6 +12,12 @@ basePath: /form/api
 schemes:
   - http
 paths:
+  /health:
+    get:
+      summary: check health of server
+      responses:
+        200:
+          description: OK
   /myforms:
     get:
       summary: Returns The array of forms created by user whose api key is mentioned

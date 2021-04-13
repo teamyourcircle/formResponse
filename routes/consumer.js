@@ -1,8 +1,8 @@
-const consumerSchema=require('../Model/consumerSchema');
+const consumerSchema=require('../models/consumerSchema');
 const express = require('express');
 const router=express.Router();
-const validate = require('../MiddleWareFun/validateFormAuthor');
-const consumers = require('../Consumers');
+const validate = require('../middleWareFun/validateFormAuthor');
+const consumers = require('../consumers');
 const fetch = require('node-fetch');
 
 router.get('/get/consumers',async (req,res)=>{

@@ -1,5 +1,11 @@
-### Response Collection of form is there 
+## Response Collection of form is there 
+
+
+### env file content in root folder
 ```
-a form response backend
+NODE_ENV=test
+LOG_DIRECTORY=./logs/test
+URI=mongodb://localhost:27017/test
+PORT=5002
 
 ```
