@@ -1,56 +1,42 @@
-const express = require('express');
 const mongoose = require('mongoose');
-const swaggerRoute = require('./swagger/swagger');
-const formInforoute = require('./routes/form_info');
-const consumerInfoRoute = require('./routes/consumer');
-const cors = require('cors');
-const app = express();
-const formRoute = require('./routes/routes');
-const port = process.env.port || 5002;
-const uri = process.env.URI ;
+const app = require('./api');
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config/config')[env];
 const consumers = require('./consumers');
 var socket = require('socket.io');
 const redis = require('redis');
 const subscriber = redis.createClient();
 const busses = require('./subscribers');
 const filter_function_by_busname = require('./subscribers/subscriber');
-var server = app.listen(port, function(){
-    console.log(`listening for requests on port ${port}`);
+const logger = require('./util/logger');
+const globalConstant = require('./util/globalConstant');
+
+/**
+ * start the server
+ */
+var server = app.listen(config.port, function(){
+    logger.info(`listening for requests on port ${config.port} :: stage -> ${env}`);
 });
 const io = socket(server, {
     cors: {
         origin: '*',
     }
 });
-app.use(cors());
-//tester middleware
-app.use(express.json());
-const testFun = require('./middleWareFun/auth');
-app.use(testFun);
-app.use('/form/api',[formInforoute,consumerInfoRoute]);
-
-const socketHandlerMiddleware = (req,res,next) => {
-    if(req.method=='POST'){
-        const roomId = req.body.form_id;  
-        io.to(roomId).emit('new-response');
-    }
-    next();
-}
-app.use('/api', [socketHandlerMiddleware,formRoute]);
-app.use('/form/developer',swaggerRoute);
-
 /*
 *starting mongo client
 */
-mongoose.connect( uri, {
-    useNewUrlParser:true, useUnifiedTopology: true
-}, () => {
-    console.log('Connected to mongoDB..!');
+mongoose.connect( config.uri, 
+    { useNewUrlParser: true , useUnifiedTopology: true , useCreateIndex: true}
+, (err,res) => {
+    if(err){
+        logger.error(`not connected to mongo db due to ${err}`);
+    }else{
+        logger.info('connected to mongo db --> '+env);
+    }
 });
 /*
 *starting the consumers
 */
-
 (async ()=>{
     consumers.map(c =>{
         c.consumer(c.queue);
@@ -61,16 +47,15 @@ mongoose.connect( uri, {
 * socket connection handler
 */
 io.on("connection", socket => {
-    socket.on("join", async room => {
-    console.log('join the room :: '+room);
+    socket.on(globalConstant.JOIN, async room => {
+    logger.info('joining the room :: roomID -> '+room);
       socket.join(room);
     })
 })
-
 /*
 * running the functionality on new message
 */
-subscriber.on("message",function(channel,msg){
+subscriber.on(globalConstant.MESSAGE,function(channel,msg){
     filter_function_by_busname(channel,msg);
   }); 
 /*

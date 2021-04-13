@@ -4,7 +4,10 @@
   "description": "```\r contributed by suhail \r and hardik helped suhail .",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon index.js"
+    "start": "node index.js",
+    "preTest": "eslint .",
+    "prettyCheck": "pretty-quick --staged",
+    "test": "env-cmd -f ./test/.env --use-shell \"mocha --reporter spec --exit\""
   },
   "repository": {
     "type": "git",
@@ -19,6 +22,7 @@
   "dependencies": {
     "amqplib": "^0.7.1",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "googleapis": "^67.0.0",
     "mongoose": "^5.10.8",
@@ -28,9 +32,13 @@
     "swagger-ui-express": "^4.1.6",
     "uuid": "^8.3.1",
     "v4": "0.0.1",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.2",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "eslint": "^7.24.0",
+    "mocha": "^8.3.2",
     "nodemon": "^2.0.5"
   }
 }
