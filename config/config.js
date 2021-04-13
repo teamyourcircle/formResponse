@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports= {
     development: {
         uri: process.env.URI,
