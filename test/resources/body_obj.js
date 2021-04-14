@@ -45,3 +45,5 @@ exports.consumerResponse = {
     ],
     "formId": 118
 }
+
+exports.formTemplatedeleteRes = {'status':'done','id':118}

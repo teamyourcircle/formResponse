@@ -1,4 +1,5 @@
 module.exports = {
-  NOT_FOUND: 'not found'  
+  NOT_FOUND: 'not found'  ,
+  FORM_NOT_FOUND: 'form not found'
 };
   
