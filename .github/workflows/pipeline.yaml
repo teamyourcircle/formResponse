@@ -24,6 +24,11 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
+    # set up rabbitmq
+    - name: set rabbitmq
+      uses: nijel/rabbitmq-action@v1.0.0
+      with:
+        rabbitmq version: '5'    
     #setup mongo
     - name: set mongoDB v${{ matrix.mongodb-version }}
       uses: supercharge/mongodb-github-action@1.2.0
