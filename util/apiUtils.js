@@ -1,3 +1,6 @@
+const responseCollection = require('../models/responseSchema');
+const globalConstant = require('../util/globalConstant');
+const logger = require('../util/logger');
 exports.getError = (message, statusCode) => {
   return {
     statusCode,
@@ -44,4 +47,12 @@ const compare = (field,labels) =>{
       }
   }
   return false;
+}
+/**
+ * delete response
+ * @param {*} id 
+ */
+exports.deleteResponse = (id) => {
+  logger.debug(`deleting response with responseID ${id}`);
+  return responseCollection.deleteOne({[globalConstant.UNDERSCORE_ID]:id});
 }

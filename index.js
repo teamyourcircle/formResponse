@@ -78,3 +78,4 @@ const socketHandlerMiddleware = (req,res,next) => {
     next();
 }
 app.use('/api', [socketHandlerMiddleware,formRoute]);
+module.exports = app;

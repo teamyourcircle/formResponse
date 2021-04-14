@@ -1,6 +1,7 @@
 module.exports = {
     JOIN: 'join',
     TOKEN: 'access-token',
-    MESSAGE: 'message'
+    MESSAGE: 'message',
+    UNDERSCORE_ID: '_id'
 };
   
