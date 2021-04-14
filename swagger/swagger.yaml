@@ -89,7 +89,7 @@ paths:
           description: form-template not found      
         default:
           description: Unexpected error          
-  /get/form/{formId}:
+  /get/responses/{formId}:
     get:
       summary: Get all the responses of form by formId
       parameters:
