@@ -1,4 +1,5 @@
 const responseCollection = require('../models/responseSchema');
+const consumerSchema = require('../models/consumerSchema');
 const globalConstant = require('../util/globalConstant');
 const logger = require('../util/logger');
 exports.getError = (message, statusCode) => {
@@ -55,4 +56,11 @@ const compare = (field,labels) =>{
 exports.deleteResponse = (id) => {
   logger.debug(`deleting response with responseID ${id}`);
   return responseCollection.deleteOne({[globalConstant.UNDERSCORE_ID]:id});
+}
+/**
+ * @param {*} formId
+ */
+exports.deleteConsumer = (formId) => {
+  logger.debug('deleting conumer doc');
+  return consumerSchema.deleteOne({formId});
 }

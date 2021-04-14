@@ -1,5 +1,6 @@
-var open = require('amqplib').connect('amqp://localhost:5672');
-const logger = require('../util/logger');
+const env = process.env.NODE_ENV || 'development';
+const config = require('../config/config')[env];
+var open = require('amqplib').connect(config.RABBIT_MQ_URL);const logger = require('../util/logger');
 const publishToQueue = async (queue, payload, durable = false) => {
     open.then(function(conn) {
         return conn.createChannel();

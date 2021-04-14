@@ -9,7 +9,6 @@ const config = require('../config/config')[env];
 const globalConstant = require('../util/globalConstant');
 const logger = require('../util/logger');
 const apiUtils = require('../util/apiUtils');
-const { log } = require('winston');
 
 describe('test the submission of response', function () {
     let responseID ;

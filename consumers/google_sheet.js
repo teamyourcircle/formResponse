@@ -1,10 +1,11 @@
-var open = require('amqplib').connect('amqp://localhost:5672');
-var env = require('../config/config')['development']
 const {google} = require('googleapis');
 const fetch = require('node-fetch');
 const logger = require('../util/logger');
+const apiUtils = require('../util/apiUtils');
 const sheets = google.sheets('v4')
-
+const env = process.env.NODE_ENV || 'development';
+const config = require('../config/config')[env];
+var open = require('amqplib').connect(config.RABBIT_MQ_URL);
 const google_sheet = async (queue, isNoAck = false, durable = false, prefetch = null) => {
 // Consumer
 open.then(function(conn) {
@@ -19,7 +20,7 @@ open.then(function(conn) {
         }
       });
     });
-  }).catch(console.warn);
+  }).catch(logger.warn);
 }
 module.exports = google_sheet;
 
@@ -83,7 +84,7 @@ const authorize = (callback, formId, integration_id,payload) => {
         callback(oAuth2Client,payload);
     })
     .catch(err =>{
-        console.log(err);
+        logger.err('not able to authorize from google :: '+err);
     })
 }
 
@@ -94,7 +95,8 @@ const authorize = (callback, formId, integration_id,payload) => {
  */
 const set_integration_doc = (formId,integrationId)=>{
     return new Promise((resolve,reject)=>{
-    fetch(`http://localhost:5000/auth/api/all/oauthApps?integration_id=${integrationId}`)
+    const url = apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL,`/auth/api/all/oauthApps?integration_id=${integrationId}`)    
+    fetch(url)
     .then(res => res.json())
     .then(data => {
         if(data.integartionList.length){
@@ -103,7 +105,7 @@ const set_integration_doc = (formId,integrationId)=>{
         }
     })
     .catch(err => {
-        console.log(err);
+        logger.error('no additional info found :: '+err);
         reject(err);
     })
     })
