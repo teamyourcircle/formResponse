@@ -89,16 +89,17 @@ paths:
           description: form-template not found      
         default:
           description: Unexpected error          
-  /get/form/{formId}:
+  /get/responses:
     get:
       summary: Get all the responses of form by formId
       parameters:
+        - $ref: '#/parameters/access_token'
         - in: query
           name: key
           required: false
           type: string
           description: mention your api_key
-        - in: path
+        - in: query
           name: formId
           required: true
           type: integer
@@ -213,11 +214,17 @@ paths:
     get:
       summary: Get particular response by giving responseId
       parameters:
+        - $ref: '#/parameters/access_token'
         - in: query
           name: key
           required: false
           type: string
           description: mention your api_key
+        - in: query
+          name: formId
+          required: true
+          type: string
+          description: mention formId   
         - in: path
           name: responseId
           required: true
@@ -259,7 +266,7 @@ paths:
           name: formId
           required: true
           type: string
-          description: mention responseId 
+          description: mention formId 
       responses:
         200:
           description: OK    
@@ -381,13 +388,13 @@ definitions:
   deleteResponse:
     required:
       - response_id
-      - form_id
+      - formId
     properties:
       response_id:
         type: string
         description: >
           Your Response ID
-      form_id:
+      formId:
         type: string
         description: >
           Your form ID
