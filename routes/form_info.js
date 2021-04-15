@@ -29,7 +29,7 @@ router.get('/myforms', (req,res)=>{
     return res.json({form:data.forms})
   })
   .catch(err => {
-    logger.error('forms not fetched of current user');
+    logger.error('forms not fetched of current user '+err);
     return res.status(HttpStatus.NOT_FOUND).json(apiUtils.getError('forms not fetched',HttpStatus.NOT_FOUND));
   })
 })
@@ -40,13 +40,13 @@ router.delete('/forms/delete',verify,(req,res)=>{
     .then(
       function(response) {
         if (response.ok) {
-          logger.debug('form template deleted of formId : '+formId);
           response.json().then(function(data) {
+            logger.debug('form template deleted of formId : '+data.id);
             respSchema.deleteMany({formId}).then(result=>{
               logger.debug('all responses deleted of formid : '+formId);
               consumerSchema.deleteOne({formId}).then(result=>{
                 logger.debug('all consumers deleted of formid : '+formId);
-                res.status(HttpStatus.OK).json(apiUtils.getResponse('form foot prints removed'));
+                res.status(HttpStatus.OK).json(apiUtils.getResponse('form foot prints removed',HttpStatus.OK));
               })
             })
           });

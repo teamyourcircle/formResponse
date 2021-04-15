@@ -54,7 +54,7 @@ router.get('/get/response/:responseId',verify, (req,res)=>{
   
 });
 
-router.get('/get/responses/:formId', verify,(req,res)=>{
+router.get('/get/responses', verify,(req,res)=>{
     const formId = req.query.formId;
     logger.debug(`getting responses of formId : ${formId}`);
     fetch(apiUtils.createUrl(config.FORM_SERVICE_BASE_URL,`/forms/form_info/${formId}`)).then(response => {
