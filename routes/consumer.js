@@ -1,15 +1,23 @@
-const consumerSchema=require('../Model/consumerSchema');
+const consumerSchema=require('../models/consumerSchema');
 const express = require('express');
 const router=express.Router();
-const validate = require('../MiddleWareFun/validateFormAuthor');
-const consumers = require('../Consumers');
+const consumers = require('../consumers');
 const fetch = require('node-fetch');
+const HttpStatus = require('http-status-codes');
+const check_form_author = require('../middleWareFun/check_form_author');
+const logger = require('../util/logger');
+const apiUtils = require('../util/apiUtils');
+const globalConstant = require('../util/globalConstant');
+const env = process.env.NODE_ENV || 'development';
+const config = require('../config/config')[env];
 
 router.get('/get/consumers',async (req,res)=>{
     const {formId} = req.query;
+    logger.debug(`fetch consumers for formId ${formId}`);
     consumerSchema.findOne({formId})
     .then(async (consumer)=>{
         if(consumer){
+            logger.debug('consumer found');
             var infos = [];
             let res_body = {};
             for(let i=0;i<consumer.queueName.length;i++){
@@ -20,69 +28,87 @@ router.get('/get/consumers',async (req,res)=>{
                 res_body.formId = parseInt(formId);
             }
             if(res_body.queueName)
-            return res.status(200).json(res_body);
+            return res.status(HttpStatus.OK).json(res_body);
             else
-            return res.status(200).json({queueName: [], formId});
+            return res.status(HttpStatus.OK).json({queueName: [], formId});
         }
-        else
-            res.status(404).json({"queueName":[], "formId":parseInt(formId)});    
+        else{
+            logger.error('consumer not found');
+            res.status(HttpStatus.NOT_FOUND).json({"queueName":[], "formId":parseInt(formId)});  
+        }  
     })
     .catch(err =>{
-        res.status(500).json({"msg":`internal error :: ${err}`})
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(apiUtils.getError('not able to fetch consumers :: '+err, HttpStatus.INTERNAL_SERVER_ERROR))
     })
 })
 
-router.put('/update/consumers', validate,(req,res)=>{
+router.put('/update/consumers', check_form_author,(req,res)=>{
     const {queueName,formId } = req.body;
+    logger.debug('update the consumer :: add '+queueName);
     consumerSchema.findOne({formId})
     .then(fetchedconsumer =>{
         if(fetchedconsumer==null){
+            logger.debug('create a queue and push '+queueName);
             const queue = [queueName];
             const consumer = new consumerSchema({
                 queueName: queue
                 ,formId
             });
             consumer.save().then(consumer => {
-                return res.status(200).json({"msg": "updated successfully"});
+                return res.status(HttpStatus.OK).json(apiUtils.getResponse('updated successfully',HttpStatus.OK));
             })
         }else{
-            consumerSchema.update({"formId": formId},{$push:{"queueName":queueName}})
-            .then(consumer =>{
-            res.status(200).json({"msg": "updated successfully"});
-        })
-    }
-        
+            if(fetchedconsumer[globalConstant.QUEUE_SCHEMA].indexOf(queueName)==-1){
+                logger.debug('push '+queueName);
+                consumerSchema.updateOne({"formId": formId},{$push:{"queueName":queueName}})
+                .then(consumer =>{
+                return res.status(HttpStatus.OK).json(apiUtils.getResponse('updated successfully',HttpStatus.OK));
+            })}else{
+                logger.debug('consumer already added');
+                return Promise.reject('consumer already present');
+        }}
     })
     .catch(err =>{
-        res.status(500).json({"err":`internal error :: ${err}`})
+        logger.error(`queue not updated due to ${err}`);
+        res.status(HttpStatus.NOT_FOUND).json(apiUtils.getError('queue not updated :: '+err, HttpStatus.NOT_FOUND));
     })
 })
 
-router.delete('/remove/consumers', validate,(req,res)=>{
+router.delete('/remove/consumers', check_form_author,(req,res)=>{
     const {queueName,formId } = req.body;
+    logger.debug(`remove a consumer ${queueName}`);
     consumerSchema.findOne({formId})
     .then(fetchedconsumer =>{
         if(fetchedconsumer==null){
-            return res.status(404).json({"msg": "not found error"});
+            logger.debug('consumer schema not found');
+            return res.status(HttpStatus.NOT_FOUND).json({"msg": "not found error"});
         }else{
-            consumerSchema.update({"formId": formId},{$pull:{"queueName":queueName}})
-            .then(consumer =>{
-            res.status(200).json({"msg": "removed successfully"});
-        })
+            if(fetchedconsumer[globalConstant.QUEUE_SCHEMA].indexOf(queueName)!=-1){
+                logger.debug('consumer schema found pull queue-name');
+                consumerSchema.updateOne({"formId": formId},{$pull:{"queueName":queueName}})
+                .then(consumer =>{
+                res.status(HttpStatus.OK).json({"msg": "removed successfully"});
+                })
+            }else{
+                logger.error('consumer already removed');
+                return Promise.reject('consumer already removed');
+            }
     }
-        
     })
     .catch(err =>{
-        res.status(500).json({"err":`internal error :: ${err}`})
+        res.status(HttpStatus.NOT_FOUND).json(apiUtils.getError('queue not updated :: '+err, HttpStatus.NOT_FOUND));
     })
 })
 
 router.get('/get/all/consumers',(req,res)=>{
+    logger.debug('get all the available consumers in this app');
     const {tags} = req.query;
     if(!tags){
+        logger.debug('no tags return all');
         res.json(consumers);
     }else{
         const tagsArr = tags.split(',');
+        logger.debug('search with tags '+tagsArr);
         res.json(get_consumers_by_tag(tagsArr));
     }
 
@@ -123,7 +149,7 @@ const get_info_for_consumer = async (queueName,token,formId) =>{
  * @param {*} consumer 
  */
 const getSupportiveEmails = (consumer,token) => {
-    return fetch(`http://localhost:5000/auth/api/user/oauthApps/byIntegrationId?integration_id=${consumer}`, {
+    return fetch(apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL,`/auth/api/user/oauthApps/byIntegrationId?integration_id=${consumer}`), {
             method: 'GET',
             headers: {
                 'Content-Type':'application/json',
