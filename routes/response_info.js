@@ -67,7 +67,7 @@ router.get('/get/responses', verify,(req,res)=>{
           ]).exec((err,responses) => {
             if(err===null){
             let selected_responses = [];
-            logger.error('filter responses')
+            logger.debug('filter responses')
             responses.map(response => {
               let labels = [];
               response.sections.map(section => {
