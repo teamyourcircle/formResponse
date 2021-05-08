@@ -24,7 +24,7 @@ module.exports = [
         display_name: "Google Sheet",
         authRequired: true,
         feature_flag: true,
-        logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Google_Sheets_logo.svg",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Google_Sheets_2020_Logo.svg/1200px-Google_Sheets_2020_Logo.svg.png",
         description: "on incoming new response we will create a new row in connected spreadsheet"
     }
 ]
