@@ -3,8 +3,8 @@
 
 ### env file content in root folder
 ```
-NODE_ENV=test
-LOG_DIRECTORY=./logs/test
+NODE_ENV=development
+LOG_DIRECTORY=./logs/development
 URI=mongodb://localhost:27017/test
 PORT=5002
 
