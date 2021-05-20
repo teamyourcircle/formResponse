@@ -1,0 +1,12 @@
+2021-05-07T05:53:14.508Z : [32minfo[39m: listening for requests on port 5002 :: stage -> development
+2021-05-07T05:56:32.446Z : [32minfo[39m: listening for requests on port 5002 :: stage -> development
+2021-05-07T05:56:32.506Z : [33mwarn[39m: Socket closed abruptly during opening handshake
+2021-05-07T05:56:36.330Z : [32minfo[39m: connected to mongo db --> development
+2021-05-07T05:56:48.631Z : [32minfo[39m: listening for requests on port 5002 :: stage -> development
+2021-05-07T05:56:52.099Z : [32minfo[39m: connected to mongo db --> development
+2021-05-07T05:57:07.080Z : [34mdebug[39m: inside health api :: stage -> development
+2021-05-07T11:29:15.287Z : [32minfo[39m: listening for requests on port 5002 :: stage -> development
+2021-05-07T11:29:19.927Z : [32minfo[39m: connected to mongo db --> development
+2021-05-07T11:29:28.606Z : [32minfo[39m: listening for requests on port 5002 :: stage -> development
+2021-05-07T11:29:33.034Z : [32minfo[39m: connected to mongo db --> development
+2021-05-07T11:30:06.229Z : [34mdebug[39m: inside health api :: stage -> development

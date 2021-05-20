@@ -19,7 +19,6 @@ const googleSheetMaker = (req, res, next) => {
     callback(oAuth2Client);
   }
   function createSheet(auth) {
-    console.log('creating a sheet ');
     const sheets = google.sheets({version: 'v4', auth});
     const resource = {
       properties: {

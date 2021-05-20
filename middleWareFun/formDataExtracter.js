@@ -8,7 +8,7 @@ const dataExtracter = (req, res, next) => {
         return res.status(404).json({'msg':`form with form_id ${req.body.form_id} not exist`});
     }else if(formObj===undefined){
         return res.status(403).json({'msg':`not correct user`});
-    }   
+    }
     else{
         req.form = formObj[0];
     }
