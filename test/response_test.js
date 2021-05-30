@@ -16,7 +16,7 @@ describe('test the submission of response', function () {
     .reply(HttpStatus.OK,bodyObj.userInfo);
     it('should successfully submit the response', function(done){
         request(server)
-        .post('/api/response')
+        .post('/api/submit/response')
         .send(bodyObj.formResponse)
         .set('access-token','token')
         .set('accept','application/json')

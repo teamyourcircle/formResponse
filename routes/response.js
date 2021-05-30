@@ -12,7 +12,7 @@ const config = require('../config/config')[env];
 const verify = require('../middleWareFun/user_info_by_token');
 
 router.use(express.json());
-router.post("/response", verify,(req,res)=>{
+router.post("/submit/response", verify,(req,res)=>{
   const {form_id,section_list} = req.body;
   logger.debug(`submitting the response of form : ${form_id}`)   
   const responseBody = {

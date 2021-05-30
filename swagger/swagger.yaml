@@ -89,6 +89,44 @@ paths:
           description: form-template not found      
         default:
           description: Unexpected error          
+
+  /submit/response:
+    post:
+      summary: Submit form responses by form_id and section list
+      parameters:
+        - $ref: '#/parameters/access_token'
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/submitResponse'
+          required: true
+      description: >-
+         This api allows you to submit responses with your access token , form_id and your response
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        401:
+          description: key is not Authorized
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: Token not recognized
+        404:
+          description: form with given formId not found 
+          schema:
+            type: object
+            properties:
+              Status:
+                type: string
+                example: Not Found Error
+        500:
+          description: Internal Server Error      
+        default:
+          description: Unexpected error
   /get/responses:
     get:
       summary: Get all the responses of form by formId
@@ -358,6 +396,22 @@ paths:
         default:
           description: Unexpected error        
 definitions: 
+  submitResponse:
+    required:
+      - form_id
+      - section_list
+    properties:
+      form_id:
+        type: string
+        description: form_id
+      section_list :
+        type: array
+        items: 
+          type: array
+          items: 
+            type: object
+        description: response here
+
   googleOauthClient:
     required:
       - client_id
