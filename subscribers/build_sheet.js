@@ -37,7 +37,7 @@ function addValueToSheet(auth,msg) {
             columnIndex: 0
           },
           rows: buildRowsForData(row_count,COLUMNS,data),
-          fields: '*'
+          fields: '*',
         }
       });
       //single request

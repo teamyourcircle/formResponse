@@ -52,10 +52,8 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
     if(responseJSON.status == HttpStatus.OK) {
       logger.debug('sheet found, exiting');
       flag=true;
-      return res.status(HttpStatus.OK).json(responseJSON)
+      return Promise.reject(responseJSON)
     }
-  })
-  .then(() => {
     if(!flag){
       logger.debug('traversing response data');
       for(var i=0;i<formResponseArray.length;i++){
@@ -78,11 +76,6 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
       userFormData = {...responseSummary,...choiceresponseSummary};
       return Promise.resolve();
     }
-    else{
-      let message='Sheet found Hurry!!';
-      logger.debug(message);
-      return res.json(200);
-    }
   })
   .then(() => {
     logger.debug('creating sheet');
@@ -99,8 +92,11 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
     }
   })
   .catch(err =>{
-    logger.error('sheet cannot be created :: '+err);
-    res.status(HttpStatus.FORBIDDEN).json(apiUtils.getResponse('sheet cannot be created :: '+err,HttpStatus.FORBIDDEN))
+    logger.error('sheet cannot be created');
+    res.status(HttpStatus.FORBIDDEN).json({ 
+      'message': 'new sheet cannot be created :: '+err,
+      'error' : err
+     })
   })
 })
 

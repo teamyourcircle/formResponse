@@ -59,12 +59,11 @@ function sheetCreator(request, formData, req){
       logger.debug('authorized with google')
       callback(oAuth2Client);
     }
-  
     function createSheet(auth) {
       const sheets = google.sheets({version: 'v4', auth});
       const resource = {
         properties: {
-          title: req.formData.form_title,
+          title: req.formData[0].form_title,
         },
         sheets: [
           {
