@@ -363,7 +363,7 @@ definitions:
       - client_id
       - client_secret
       - redirect_uri
-      - form_id
+      - formId
       - refresh_token
       - supportive_email
     properties:
@@ -377,7 +377,7 @@ definitions:
       redirect_uri:
         type: string
         description: google redirect uri
-      form_id:
+      formId:
         type: string
       refresh_token:
         type: string

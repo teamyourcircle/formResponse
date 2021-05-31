@@ -22,9 +22,9 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
   var choiceresponseSummary = {};
   var formResponseArray=[];
   var userFormData;
-  const formId = req.body.form_id;
+  const formId = req.body.formId;
   const token = req.headers['access-token'];
-  var url = apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL, `/get/responses?formId=${formId}`);
+  var url = apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL, `/form/api/get/responses?formId=${formId}`);
   var options = {
     method: 'GET',
     headers: {
@@ -34,10 +34,11 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
     }
   }
   fetch(url, options)
-  .then(() => {
+  .then(res => res.json())
+  .then(formData => {
     logger.debug('connecting user with third-party app')
-    formResponseArray=req.formData;
-    url=apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL, '/user/oauthApps');
+    formResponseArray=formData.responseArray;
+    url=apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL, '/auth/api/user/oauthApps');
     return fetch(url, options)
   })
   .then(res => res.json())
@@ -49,9 +50,9 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
     logger.debug('checking pre-existing sheet')
     var responseJSON = oauth_sheet_helper.sheetUsercheck(formId, data, email, flag);
     if(responseJSON.status == HttpStatus.OK) {
-      logger.debug('sheet found');
+      logger.debug('sheet found, exiting');
       flag=true;
-      return res.status(HttpStatus.OK).json(responseJSON);
+      return res.status(HttpStatus.OK).json(responseJSON)
     }
   })
   .then(() => {
@@ -78,26 +79,28 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
       return Promise.resolve();
     }
     else{
-      let message = 'Something went wrong';
-      logger.error(message);
-      return Promise.reject(message);
+      let message='Sheet found Hurry!!';
+      logger.debug(message);
+      return res.json(200);
     }
   })
   .then(() => {
     logger.debug('creating sheet');
-    var sheetResponse = oauth_sheet_helper.sheetCreator(req.body, formResponseArray[0]);
-    if(sheetResponse.status==HttpStatus.OK){
+    return oauth_sheet_helper.sheetCreator(req.body, formResponseArray, req);
+  })
+  .then(status => {
+    if(status.status==HttpStatus.OK){
       logger.debug('sheet created successfully');
-      res.status(HttpStatus.OK).json({ sheetResponse });
+      res.status(HttpStatus.OK).json(status);
     }
     else{
-      logger.debug(sheetResponse.message);
-      return Promise.reject(sheetResponse.message);
+      logger.debug(status);
+      return Promise.reject(status);
     }
   })
   .catch(err =>{
-    logger.error('sheet cannot be created '+err);
-    res.status(HttpStatus.FORBIDDEN).json(apiUtils.getResponse('sheet cannot be created '+err,HttpStatus.FORBIDDEN))
+    logger.error('sheet cannot be created :: '+err);
+    res.status(HttpStatus.FORBIDDEN).json(apiUtils.getResponse('sheet cannot be created :: '+err,HttpStatus.FORBIDDEN))
   })
 })
 
@@ -162,3 +165,5 @@ router.put("/put/switch/:integrationId", (req, res) => {
     res.status(HttpStatus.UNAUTHORIZED).json(apiUtils.getResponse(message+err,HttpStatus.UNAUTHORIZED))
   } 
 });
+
+module.exports = router;

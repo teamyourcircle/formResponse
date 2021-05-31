@@ -8,7 +8,6 @@ buildRowsForData
 function addValueToSheet(auth,msg) {
     const { spreadsheet_id, sheetId ,my_formData} = msg;
     const sheets = google.sheets({version: 'v4', auth});
-    console.log('adding values to sheet ');
       var data = my_formData;
       let COLUMNS = Object.keys(data).map(key => key);
       var requests = [
