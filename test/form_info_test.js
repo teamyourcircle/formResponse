@@ -53,7 +53,7 @@ describe('test for delete forms footprint',function (done) {
             should.not.exist(err);
             logger.debug('consumers created');
             request(server)
-            .post('/api/response')
+            .post('/api/submit/response')
             .send(bodyObj.newformResponse)
             .set('access-token','token')
             .set('accept','application/json')

@@ -17,7 +17,7 @@ describe('test the response flow get|delete',function () {
         .reply(HttpStatus.OK,bodyObj.consumerResponse_1);
         logger.debug('create a response');
         request(server)
-        .post('/api/response')
+        .post('/api/submit/response')
         .send(bodyObj.formResponse_1)
         .set('access-token','token')
         .set('accept','application/json')
