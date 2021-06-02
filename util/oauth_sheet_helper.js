@@ -47,7 +47,8 @@ function sheetCreator(request, formData, req){
   return new Promise((resolve, reject) => { 
     logger.debug('inside sheetCreator');
     var response_from_google;
-    const { client_id, client_secret, redirect_uri, supportive_email, refresh_token} = request;
+    const { refresh_token } = req;
+    const { client_id, client_secret, redirect_uri, supportive_email} = request;
     authorize(createSheet);
     function authorize(callback) {
       const oAuth2Client = new google.auth.OAuth2(
@@ -102,7 +103,7 @@ function sheetCreator(request, formData, req){
           .then(res => res.json())
           .then(() => {
             logger.debug('loading data into sheet');
-            publisher.publish("buildSheet",JSON.stringify({spreadsheet_id,sheetId,my_formData:formData,client_id, client_secret, redirect_uri,refresh_token}));
+            // publisher.publish("buildSheet",JSON.stringify({spreadsheet_id,sheetId,my_formData:formData,client_id, client_secret, redirect_uri,refresh_token}));
             response_from_google = {
               url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
               sheet_info: {

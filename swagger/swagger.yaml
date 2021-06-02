@@ -307,56 +307,7 @@ paths:
         200:
           description: OK    
         404:
-          description: Not Found
-  /put/switch/{integrationId}:
-    put:
-      summary: Switch your access to another account
-      parameters:
-        - $ref: '#/parameters/access_token'
-        - in: body
-          name: body
-          required: true
-          schema: 
-            $ref: '#/definitions/switch'
-        - in: path
-          name: integrationId
-          required: true
-          enum: 
-            - google-sheets
-          type: string
-          description: mention integration_id
-        - in: query
-          name: key
-          required: false
-          type: string
-          description: mention your api_key
-      description: >-
-         So this Api Get particular response by giving responseId 
-      produces:
-        - application/json
-      responses:
-        200:
-          description: OK
-        401:
-          description: key is not Authorized
-          schema:
-            type: object
-            properties:
-              msg:
-                type: string
-                example: Token is not recognized
-        404:
-          description: Credentials with ClientID, ClientSecret, redirectUrl and Token not found
-          schema:
-            type: object
-            properties:
-              Status:
-                type: string
-                example: Not Found Error
-        500:
-          description: Internal Server Error
-        default:
-          description: Unexpected error        
+          description: Not Found        
 definitions: 
   googleOauthClient:
     required:
@@ -364,7 +315,6 @@ definitions:
       - client_secret
       - redirect_uri
       - formId
-      - refresh_token
       - supportive_email
     properties:
       client_id:
@@ -379,9 +329,6 @@ definitions:
         description: google redirect uri
       formId:
         type: string
-      refresh_token:
-        type: string
-        description: google refresh_token
       supportive_email:
         type: string
         description: Supportive email address
@@ -398,19 +345,6 @@ definitions:
         type: string
         description: >
           Your form ID
-  switch:
-    required:
-      - switch_to
-      - switch_from
-      - form_id
-    properties:
-      switch_to:
-        type: string
-      switch_from:
-        type: string
-      form_id:
-        type: string
-        description: form ID
 parameters: 
     access_token: &access_token
       name: access-token
