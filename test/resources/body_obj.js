@@ -29,6 +29,20 @@ exports.newformResponse = {
         }]
     ]
 }
+
+exports.newformTemplate={
+    template:{
+        section: {
+            section_title: ["test-section1"],
+            section_description: ["here section 1"],
+            section_fields: [2]
+          },
+        field: {
+            field_label: ["gender","name"]
+        }
+    }
+}
+
 exports.formResponse_1 = {
     form_id: '420',
     section_list: [

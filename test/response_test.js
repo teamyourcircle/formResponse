@@ -14,6 +14,8 @@ describe('test the submission of response', function () {
     let responseID ;
     nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/dashboard')
     .reply(HttpStatus.OK,bodyObj.userInfo);
+    nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.formResponse.form_id}`)
+        .reply(HttpStatus.OK,bodyObj.newformTemplate);
     it('should successfully submit the response', function(done){
         request(server)
         .post('/api/submit/response')
