@@ -9,7 +9,7 @@ const logger = require('../util/logger');
 const check_form_author = (req, res, next) => {
     logger.debug('determine the form author');
     const token = req.headers[globalConstant.TOKEN];
-    const formId = req.body.formId || req.query.formId 
+    const formId = req.body.formId || req.query.formId;
     if(token){
         const url = apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL,'/form/api/myforms');
         const options = {

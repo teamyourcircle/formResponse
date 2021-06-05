@@ -39,10 +39,8 @@ router.post("/oauth/createSheets",[check_form_author,refresh_token_provider], (r
   .then(formData => {
     logger.debug('connecting user with third-party app')
     formResponseArray=formData.responseArray;
-    url=apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL, '/auth/api/user/oauthApps');
-    return fetch(url, options)
+    return Promise.resolve(req.oauthBody);
   })
-  .then(res => res.json())
   .then(data => {
     if(data.msg){
       logger.debug('data forbidden error');

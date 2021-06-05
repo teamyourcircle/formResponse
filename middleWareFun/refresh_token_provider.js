@@ -33,6 +33,7 @@ const refresh_token_provider = (req, res, next) => {
                 if(item && item['email'] && item['email']==supportive_email){
                     flag=true;
                     req.refresh_token = item['refresh_token'];
+                    req.oauthBody=item;
                     return Promise.resolve();
                 }
             });
