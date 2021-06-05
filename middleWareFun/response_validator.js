@@ -7,9 +7,9 @@ const HttpStatus=require('http-status-codes');
 const apiUtils=require('../util/apiUtils');
 
 const compareRespAndTemplate = (req,res,next)=>{
-    logger.debug('Inside compare response and template middleware')
+    logger.debug('Inside compare response and template middleware');
     const resp = req.body.section_list;
-    logger.info('fetching template');
+    logger.debug('fetching template');
     fetch(config.FORM_SERVICE_BASE_URL+`/forms/form_info/${req.body.form_id}`,{method:'GET'})
     .then((response)=>{
         if(response.ok)
@@ -22,11 +22,9 @@ const compareRespAndTemplate = (req,res,next)=>{
         logger.debug('template fetched successfully')
         compareNoOfSection(template,resp)
         .then((res)=>{
-            //Run only when no. of sections are equal
             return compareNoOfFields(template,resp)
         })
         .then((res)=>{
-            //Run only when no. of fields are equal
             return compareKeys(template,resp);
         })
         .then((res)=>{
@@ -34,11 +32,11 @@ const compareRespAndTemplate = (req,res,next)=>{
             next();
         })
         .catch((err)=>{
-            res.status(HttpStatus.BAD_REQUEST).json(apiUtils.getError(err,404));
+            res.status(HttpStatus.BAD_REQUEST).json(apiUtils.getError(err,400));
         })
     })
     .catch((err)=>{
-        res.status(HttpStatus.BAD_REQUEST).json(apiUtils.getError(err,404))
+        res.status(HttpStatus.BAD_REQUEST).json(apiUtils.getError(err,400))
     })
 }
 
@@ -49,11 +47,11 @@ const compareNoOfSection= (temp,resp)=>{
     return new Promise((resolve,reject)=>{
         if(temp.template.section.section_fields.length===resp.length)
         {  
-            logger.info('No. of sections are equal.');
+            logger.debug('No. of sections are equal.');
             resolve("No. of sections are equal");
         }
         else{
-            logger.info('No. of sections are not equal.');
+            logger.debug('No. of sections are not equal.');
             reject("Response Not Matched With Template:-- No. of sections are not equal");
         }
     })
@@ -76,10 +74,10 @@ const compareNoOfFields=(temp,resp)=>{
             }
         }
         if(flag){
-            logger.info('No. of fields are equal.');
+            logger.debug('No. of fields are equal.');
             resolve();}
         else{
-            logger.info('No. of fields are not equal.');
+            logger.debug('No. of fields are not equal.');
             reject("Response Not Matched with Template:-- Fields are not equal");}
     })
 }
@@ -105,15 +103,15 @@ const compareKeys=(temp,resp)=>{
             }
         }
 
-
-        if(JSON.stringify(arr)===JSON.stringify(temp.template.field.field_label)){
-            logger.info('No. of keys are equal.');
-            resolve('Response Matched');
+        const templateArray=temp.template.field.field_label;
+        for(let f in templateArray){
+            if(!arr.includes(templateArray[f])){
+                logger.debug(`{${templateArray[f]}} key is missing at ${f}th position`);
+                reject(`{${templateArray[f]}} key is missing at ${f}th position`);
+            }
         }
-        else{
-            logger.info('No. of keys are not equal.');
-            reject('Response Not Matched with Template:-- field label missing');
-        }
+        logger.debug('No. of keys are equal and same.');
+        resolve('Response Matched');
     })
 }
 
