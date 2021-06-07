@@ -27,18 +27,12 @@ const refresh_token_provider = (req, res, next) => {
         logger.debug('integartionList fetched');
         if(data){
             logger.debug('search refresh token');
-            logger.debug(JSON.stringify(data));
-            let flag=false;
-            data["integartionList"].forEach(item => {
-                if(item && item['email'] && item['email']==supportive_email){
-                    flag=true;
-                    req.refresh_token = item['refresh_token'];
-                    req.oauthBody=item;
-                    return Promise.resolve();
-                }
-            });
-            if(!flag){
-                logger.debug('refresh token not found');
+            if(data["integartionList"].length){
+                req.refresh_token = data["integartionList"][0]['refresh_token'];
+                req.oauthBody=data["integartionList"][0];
+            }
+            else{
+                logger.debug(' refresh token not found');
                 return Promise.reject('refresh token not found');
             }
         } else {

@@ -94,12 +94,13 @@ function sheetCreator(request, formData, req){
             body:JSON.stringify({[request.formId]: {
               spreadsheet_id,
               sheetId,
+              deleted: false
             }})
           })
           .then(res => res.json())
           .then(() => {
             logger.debug('loading data into sheet');
-            // publisher.publish("buildSheet",JSON.stringify({spreadsheet_id,sheetId,my_formData:formData,client_id, client_secret, redirect_uri,refresh_token}));
+            publisher.publish("buildSheet",JSON.stringify({spreadsheet_id,sheetId,my_formData:formData,client_id, client_secret, redirect_uri,refresh_token}));
             response_from_google = {
               url: `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/edit#gid=${sheetId}`,
               sheet_info: {

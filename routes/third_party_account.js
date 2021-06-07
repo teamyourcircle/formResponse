@@ -73,12 +73,12 @@ router.post("/oauth/createSheets",[check_form_author,refresh_token_provider], (r
         })
       }
       userFormData = {...responseSummary,...choiceresponseSummary};
-      return Promise.resolve();
+      return Promise.resolve(userFormData);
     }
   })
-  .then(() => {
+  .then((sheetFormatData) => {
     logger.debug('creating sheet');
-    return oauth_sheet_helper.sheetCreator(req.body, formResponseArray, req);
+    return oauth_sheet_helper.sheetCreator(req.body, sheetFormatData, req);
   })
   .then(status => {
     if(status.status==HttpStatus.OK){
