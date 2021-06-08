@@ -7,8 +7,19 @@ const HttpStatus=require('http-status-codes');
 const apiUtils=require('../util/apiUtils');
 
 const compareRespAndTemplate = (req,res,next)=>{
-    logger.debug('Inside compare response and template middleware');
-    const resp = req.body.section_list;
+    logger.debug('Inside compare response with template middleware');
+    let resp;
+    if((req.body).hasOwnProperty('section_list')){
+        if((req.body.section_list).length!=0){
+            resp = req.body.section_list;
+        }
+        else{
+            res.status(HttpStatus.BAD_REQUEST).json(apiUtils.getError('section_list of the response must not be empty',400));
+        }
+    }
+    else {
+        res.status(HttpStatus.BAD_REQUEST).json(apiUtils.getError('Please provide section_list in the response',400))
+    }
     logger.debug('fetching template');
     fetch(config.FORM_SERVICE_BASE_URL+`/forms/form_info/${req.body.form_id}`,{method:'GET'})
     .then((response)=>{

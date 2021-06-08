@@ -4,8 +4,8 @@ const globalConstant = require('../util/globalConstant');
 const logger = require('../util/logger');
 exports.getError = (message, statusCode) => {
   return {
-    statusCode:statusCode,
-    message:message
+    statusCode,
+    message
   };
 };
 

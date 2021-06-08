@@ -16,8 +16,6 @@ router.use(express.json());
 router.post("/submit/response", verify,checkResponse,(req,res)=>{
   const {form_id,section_list} = req.body;
   logger.debug(`submitting the response of form : ${form_id}`)  
-  
-  console.log(section_list);
   const responseBody = {
     formId:form_id,
     responseBy: req.user.id,
