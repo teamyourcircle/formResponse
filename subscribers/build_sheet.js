@@ -76,6 +76,8 @@ module.exports = function (msg) {
   authorize(addValueToSheet,msg);
 }
 
+module.exports.addValueToSheet = addValueToSheet;
+module.exports.authorize = authorize;
 /*msg is this*/
 
 // let msg={

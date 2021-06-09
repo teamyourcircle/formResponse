@@ -1,3 +1,4 @@
+const logger = require("./logger");
 
 function maxRowCount(data){
     let max = 0;
