@@ -1,4 +1,3 @@
-const { resolve, reject } = require("bluebird");
 const fetch=require('node-fetch');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
@@ -62,7 +61,7 @@ const compareNoOfSection= (temp,resp)=>{
             resolve("No. of sections are equal");
         }
         else{
-            logger.debug('No. of sections are not equal.');
+            logger.error('No. of sections are not equal.');
             reject("Response Not Matched With Template:-- No. of sections are not equal");
         }
     })
@@ -88,7 +87,7 @@ const compareNoOfFields=(temp,resp)=>{
             logger.debug('No. of fields are equal.');
             resolve();}
         else{
-            logger.debug('No. of fields are not equal.');
+            logger.error('No. of fields are not equal.');
             reject("Response Not Matched with Template:-- Fields are not equal");}
     })
 }
@@ -117,7 +116,7 @@ const compareKeys=(temp,resp)=>{
         const templateArray=temp.template.field.field_label;
         for(let f in templateArray){
             if(!arr.includes(templateArray[f])){
-                logger.debug(`{${templateArray[f]}} key is missing at ${f}th position`);
+                logger.error(`{${templateArray[f]}} key is missing at ${f}th position`);
                 reject(`{${templateArray[f]}} key is missing at ${f}th position`);
             }
         }
