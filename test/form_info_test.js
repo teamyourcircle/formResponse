@@ -43,6 +43,8 @@ describe('test for delete forms footprint',function (done) {
         .reply(HttpStatus.OK,bodyObj.userInfo);
         nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${body.formId}`)
         .reply(HttpStatus.OK,bodyObj.newconsumerResponse);
+        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${body.formId}`)
+        .reply(HttpStatus.OK,bodyObj.newformTemplate);
         request(server)
         .put('/form/api/update/consumers')
         .send(bodyObj.newconsumerSchema)
@@ -53,7 +55,7 @@ describe('test for delete forms footprint',function (done) {
             should.not.exist(err);
             logger.debug('consumers created');
             request(server)
-            .post('/api/response')
+            .post('/api/submit/response')
             .send(bodyObj.newformResponse)
             .set('access-token','token')
             .set('accept','application/json')

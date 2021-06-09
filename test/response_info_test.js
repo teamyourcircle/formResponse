@@ -15,9 +15,11 @@ describe('test the response flow get|delete',function () {
     before((done)=>{
         nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.consumerResponse_1.formId}`)
         .reply(HttpStatus.OK,bodyObj.consumerResponse_1);
+        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.formResponse_1.form_id}`)
+        .reply(HttpStatus.OK,bodyObj.newformTemplate);
         logger.debug('create a response');
         request(server)
-        .post('/api/response')
+        .post('/api/submit/response')
         .send(bodyObj.formResponse_1)
         .set('access-token','token')
         .set('accept','application/json')
