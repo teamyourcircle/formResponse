@@ -11,6 +11,7 @@ const logger = require('../util/logger');
 
 describe('test the response flow get|delete',function () {
     let token = 'host token';
+    let key='fake key';
     let responseID;
     before((done)=>{
         nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.consumerResponse_1.formId}`)
@@ -48,7 +49,7 @@ describe('test the response flow get|delete',function () {
         })
     })
     
-    it('should get the responses by formId added above',function (done) {
+    it('should get the responses by formId (using access token) added above',function (done) {
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
         .reply(HttpStatus.OK,bodyObj.myForms);
         nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.consumerResponse_1.formId}`)
@@ -64,6 +65,25 @@ describe('test the response flow get|delete',function () {
             res.body['responseArray'].length.should.be.eql(1);
             done();
         })
+    })
+
+    it('should get the responses by formId (using api key)',(done)=>{
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.consumerResponse_1.formId}`)
+        .reply(HttpStatus.OK,bodyObj.formTemplate);
+        request(server)
+        .get(`/form/api/get/responses?formId=${bodyObj.consumerResponse_1.formId}`)
+        .set('api-key',key)
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end(function (err,res) {
+            should.not.exist(err);
+            res.body.should.have.keys('responseArray');
+            res.body['responseArray'].length.should.be.eql(1);
+            done();
+        })
+        
     })
 
     it('should delete the response by resposneId added above',function (done) {

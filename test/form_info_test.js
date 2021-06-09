@@ -12,9 +12,10 @@ const apiUtils = require('../util/apiUtils');
 
 describe('test for forms related information',function () {
     let token = 'access-token';
+    let key = 'fake-key';
     nock(config.FORM_SERVICE_BASE_URL).get(`/forms/user?token=${token}`)
     .reply(HttpStatus.OK,bodyObj.myFormsListFormService);
-    it('should get myforms list',function (done) {
+    it('should get myforms list using access token',function (done) {
         request(server)
         .get('/form/api/myforms')
         .set('access-token',token)
@@ -25,6 +26,34 @@ describe('test for forms related information',function () {
             res.body.should.have.keys('form');
             res.body['form'].length.should.be.eql(1);
             res.body['form'][0].should.have.keys('form_title','form_id','init','end');
+            done();
+        })
+    })
+    it('should get myforms using api key',(done)=>{
+        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/user?key=${key}`)
+        .reply(HttpStatus.OK,bodyObj.myFormsListFormService);
+
+        request(server)
+        .get('/form/api/myforms')
+        .set('api-key',key)
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end((err,res)=>{
+            should.not.exist(err);
+            res.body['form'].length.should.be.eql(1);
+            res.body['form'][0].should.have.keys('form_title','form_id','init','end');
+            done();
+        })
+    })
+    it('should handle the case when nothing is get filled by user',(done)=>{
+        request(server)
+        .get('/form/api/myforms')
+        .set('accept','application/json')
+        .expect(HttpStatus.UNAUTHORIZED)
+        .end((err,res)=>{
+            should.not.exist(err);
+            res.body.statusCode.should.be.eql(401);
+            res.body.should.have.keys('message', 'statusCode');
             done();
         })
     })
