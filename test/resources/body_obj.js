@@ -29,6 +29,25 @@ exports.newformResponse = {
         }]
     ]
 }
+exports.activeOAuthRes = {
+    "_id": "60bde569fadfff0a6a8203ad",
+    "social_id": "109517401515895928040",
+    "oauth_provider": "google",
+    "access_token": "access - token",
+    "user": "60b91f6dee3e746a0b550e96",
+    "email": "kumarnitesh2000.nk@gmail.com",
+    "integration_id": "google-sheets",
+    "refresh_token": "refresh - token",
+    "__v": 0,
+    "additional_info": {
+      "118": {
+        "spreadsheet_id": "1yLaVLlZAJGG0dcQQ8BZMmoWt0NhjeMi28r9ereAVRQo",
+        "sheetId": 977964886,
+        "deleted": false
+      },
+      "key": "val"
+    }
+  }
 
 exports.newformTemplate={
     template:{
@@ -125,6 +144,8 @@ exports.consumerResponse = {
     ],
     "formId": 118
 }
+exports.consumerPayloadSheet = `{"formId":"118","responseBy":"60b91f6dee3e746a0b550e96","sections":[[{"is_choice":false,"name":"ritu"},
+{"is_choice":true,"gender":{"male":0,"female":1}}]]}` 
 
 exports.formTemplatedeleteRes = {'status':'done','id':20}
 
