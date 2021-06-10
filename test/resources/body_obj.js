@@ -196,11 +196,27 @@ exports.integrationList = {
         "refresh_token": "",
         "__v": 0,
         "additional_info": {
-          "111": {
-            "spreadsheet_id": "",
-            "sheetId": 007
+            "111": {
+              "spreadsheet_id": "",
+              "sheetId": 007
+            }
           }
-        }
+      }
+    ]
+  };
+
+exports.integartionListWithoutAdditionInfo = {
+    "integartionList": [
+      {
+        "_id": "",
+        "social_id": "",
+        "oauth_provider": "google",
+        "access_token": "",
+        "user": "",
+        "email": "hardik@mail.com",
+        "integration_id": "google-sheets",
+        "refresh_token": "",
+        "__v": 0,
       }
     ]
   };
