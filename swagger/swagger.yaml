@@ -1,4 +1,4 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
   title: Form Public Routes
   description: Apis for FormService Public EndPoints
@@ -23,7 +23,7 @@ paths:
       summary: Returns The array of forms created by user whose api key is mentioned
       parameters:
         - $ref: "#/parameters/access_token"
-        - $ref: '#/parameters/api_key'
+        - $ref: "#/parameters/api_key"
       description: >-
         So this Api Simply Returns The array of forms created by user whose api key is mentioned
       produces:
@@ -331,55 +331,6 @@ paths:
           description: OK
         404:
           description: Not Found
-  /put/switch/{integrationId}:
-    put:
-      summary: Switch your access to another account
-      parameters:
-        - $ref: "#/parameters/access_token"
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: "#/definitions/switch"
-        - in: path
-          name: integrationId
-          required: true
-          enum:
-            - google-sheets
-          type: string
-          description: mention integration_id
-        - in: query
-          name: key
-          required: false
-          type: string
-          description: mention your api_key
-      description: >-
-        So this Api Get particular response by giving responseId
-      produces:
-        - application/json
-      responses:
-        200:
-          description: OK
-        401:
-          description: key is not Authorized
-          schema:
-            type: object
-            properties:
-              msg:
-                type: string
-                example: Token is not recognized
-        404:
-          description: Credentials with ClientID, ClientSecret, redirectUrl and Token not found
-          schema:
-            type: object
-            properties:
-              Status:
-                type: string
-                example: Not Found Error
-        500:
-          description: Internal Server Error
-        default:
-          description: Unexpected error
 definitions:
   submitResponse:
     required:
@@ -433,22 +384,22 @@ definitions:
         type: string
         description: >
           Your form ID
-parameters: 
-    access_token: &access_token
-      name: access-token
-      in: header
-      type: string
-    consumer_queue_body: &consumer_queue_body
-      name: body
-      in: body
-      schema:
-          type: object
-          properties:
-            queueName:
-              type: string          
-            formId:
-              type: string
-    api_key: &api_key
+parameters:
+  access_token: &access_token
+    name: access-token
+    in: header
+    type: string
+  consumer_queue_body: &consumer_queue_body
+    name: body
+    in: body
+    schema:
+      type: object
+      properties:
+        queueName:
+          type: string
+        formId:
+          type: string
+  api_key: &api_key
     name: api-key
     in: header
     type: string
