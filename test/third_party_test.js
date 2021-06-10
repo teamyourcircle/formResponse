@@ -21,13 +21,7 @@ describe('test for third party create sheet', (done) => {
   });
   logger.debug('testing third party for already created sheet');
   let token = 'access-token';
-  let requestBody = {
-    client_id:"dummy_client_id",
-    client_secret:"dummy_client_secret",
-    redirect_uri:"http://localhost:3000",
-    formId: 111,
-    supportive_email:'hardik@mail.com',
-  }
+  let requestBody = bodyObj.createSheetBody
   let status=HttpStatus.NOT_FOUND;
   const queryString = `?integration_id=${globalConstant.INTEGRATION_ID}&supportive_email=${requestBody.supportive_email}`;
   logger.debug('intermediate api requests nocked');
@@ -40,12 +34,9 @@ describe('test for third party create sheet', (done) => {
     .reply(HttpStatus.OK,{'responseArray':bodyObj.formResponseArray});
     nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/user/oauthApps')
     .reply(HttpStatus.OK,bodyObj.integrationList);
-    let stub = sinon.stub(oauth_sheet_helper,'sheetUsercheck');
-    stub.withArgs(requestBody.formId,bodyObj.integrationList,requestBody.supportive_email,false);
-    stub.returns(status);
     status=HttpStatus.OK;
     var stub2 = sinon.stub(oauth_sheet_helper,"sheetCreator");
-    stub2.withArgs(requestBody,bodyObj.formResponseArray);
+    stub2.withArgs(requestBody,bodyObj.formResponseArray,{});
     stub2.returns({status,'data':bodyObj.googleSheetResponse})
     request(server)
     .post('/form/api/oauth/createSheets')
@@ -54,7 +45,6 @@ describe('test for third party create sheet', (done) => {
     .set('accept','application/json')
     .expect(HttpStatus.OK)
     .end(function(err, res) {
-      logger.debug('sheet created');
       should.not.exist(err)
       res.body.should.have.keys('data','status');
       res.body.should.have.value('data',bodyObj.googleSheetResponse);
@@ -71,9 +61,6 @@ describe('test for third party create sheet', (done) => {
     .reply(HttpStatus.OK,{'responseArray':bodyObj.formResponseArray});
     nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/user/oauthApps')
     .reply(HttpStatus.OK,bodyObj.integrationList);
-    let stub = sinon.stub(oauth_sheet_helper,'sheetUsercheck');
-    stub.withArgs(requestBody.formId,bodyObj.integrationList,requestBody.supportive_email,false);
-    stub.returns({status});
     request(server)
     .post('/form/api/oauth/createSheets')
     .send(requestBody)

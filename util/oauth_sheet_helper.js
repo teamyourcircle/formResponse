@@ -17,27 +17,27 @@ const integration_id = "google-sheets";
  * @param {*} flag
  */
 
-  function sheetUsercheck(formId, eve, email,flag){
-      logger.debug('check sheet creation');
-      let sheetUrl='';
-      let sheetInfo={};
-      let local_flag=flag;
-      var add_info = eve['additional_info'];
-      if(add_info && add_info[formId] && eve.email==email){
-          sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[formId].spreadsheet_id}/edit#gid=${add_info[formId].sheetId}`;
-          sheetInfo.spreadsheet_id = add_info[formId].spreadsheet_id;
-          sheetInfo.sheetInfo = add_info[formId].sheetId;
-          local_flag = true;
-      }
-      if(local_flag){
-      logger.debug('sheet found with email : '+email);
-      return {sheetUrl, sheetInfo,'status': HttpStatus.OK ,'supportive_email': email,'source': 'already_created'};
-      }
-      else{
-      logger.debug('sheet not found')
-      return {'status': HttpStatus.NOT_FOUND};
-      }
-  }
+function sheetUsercheck(formId, eve, email,flag){
+    logger.debug('check sheet creation');
+    let sheetUrl='';
+    let sheetInfo={};
+    let local_flag=flag;
+    var add_info = eve['additional_info'];
+    if(add_info && add_info[formId] && eve.email==email){
+        sheetUrl = `https://docs.google.com/spreadsheets/d/${add_info[formId].spreadsheet_id}/edit#gid=${add_info[formId].sheetId}`;
+        sheetInfo.spreadsheet_id = add_info[formId].spreadsheet_id;
+        sheetInfo.sheetInfo = add_info[formId].sheetId;
+        local_flag = true;
+    }
+    if(local_flag){
+    logger.debug('sheet found with email : '+email);
+    return {sheetUrl, sheetInfo,'status': HttpStatus.OK ,'supportive_email': email,'source': 'already_created'};
+    }
+    else{
+    logger.debug('sheet not found')
+    return {'status': HttpStatus.NOT_FOUND};
+    }
+}
 
 function sheetCreator(request, formData, req){
   return new Promise((resolve, reject) => { 

@@ -214,7 +214,15 @@ exports.googleSheetResponse = {
     supportive_email: "hardik@gmail.com",
     status: 200,
 };
-
+exports.createSheetResponse = {
+    url: "",
+    sheet_info: {
+        spreadsheet_id:"",
+        sheeId:"",
+    },
+    supportive_email: "niteshdipg@mail.com",
+    status: 200,
+}
 exports.formResponseArray = [
     {
     "_id": "606af26e0b77321ae8eac21a",
@@ -291,3 +299,10 @@ exports.sheetFunctionalityResource = {
     sheetId: "3434219"
 }
   
+exports.createSheetBody = {
+    client_id:"dummy_client_id",
+    client_secret:"dummy_client_secret",
+    redirect_uri:"http://localhost:3000",
+    formId: 111,
+    supportive_email:'hardik@mail.com',
+}
