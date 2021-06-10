@@ -4,6 +4,7 @@ module.exports = {
     MESSAGE: 'message',
     UNDERSCORE_ID: '_id',
     QUEUE_SCHEMA: 'queueName',
-    INTEGRATION_ID: 'google-sheets'
+    INTEGRATION_ID: 'google-sheets',
+    ROW_UPPER_LIMIT: 1000
 };
   
