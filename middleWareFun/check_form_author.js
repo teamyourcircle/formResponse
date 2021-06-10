@@ -9,7 +9,7 @@ const logger = require('../util/logger');
 const check_form_author = (req, res, next) => {
     logger.debug('determine the form author');
     const token = req.headers[globalConstant.TOKEN];
-    const formId = req.body.formId || req.query.formId 
+    const formId = req.body.formId || req.query.formId;
     if(token){
         const url = apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL,'/form/api/myforms');
         const options = {
@@ -31,9 +31,9 @@ const check_form_author = (req, res, next) => {
         })
         .then(data => {
             logger.debug('forms info fetched');
-            req.formData = data.form;
             const is_validate = validate_form_created_by_current_user(data.form,formId);
             if(is_validate.length){
+                req.formData = is_validate;
                 return Promise.resolve();
             }else{
                 logger.error(`form ${formId} :: not created by user`);
