@@ -48,6 +48,21 @@ describe('test the response flow get|delete',function () {
             done();
         })
     })
+
+    it('should get the response by resposneId added above',function (done) {
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        request(server)
+        .get(`/form/api/get/response/${responseID}?formId=${bodyObj.consumerResponse_1.formId}`)
+        .set('api-key','api')
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end(function (err,res) {
+            should.not.exist(err);
+            res.body.should.have.keys('response');
+            done();
+        })
+    })
     
     it('should get the responses by formId (using access token) added above',function (done) {
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
@@ -96,6 +111,25 @@ describe('test the response flow get|delete',function () {
             formId: bodyObj.consumerResponse_1.formId
         })
         .set('access-token',token)
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end(function (err,res) {
+            should.not.exist(err);
+            res.body.should.have.keys('msg','statusCode');           
+            done();
+        })
+    })
+
+    it('should delete the response by resposneId added above',function (done) {
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        request(server)
+        .delete(`/form/api/delete/response`)
+        .send({
+            response_id: responseID,
+            formId: bodyObj.consumerResponse_1.formId
+        })
+        .set('api-key','api')
         .set('accept','application/json')
         .expect(HttpStatus.OK)
         .end(function (err,res) {

@@ -18,7 +18,7 @@ router.get('/myforms', (req,res)=>{
   const token=req.headers[globalConstant.TOKEN];
   let url;
   if(key){
-    logger.debug('fetching forms using key');
+    logger.debug(`fetching forms using key`);
     url = apiUtils.createUrl(config.FORM_SERVICE_BASE_URL,`/forms/user?key=${key}`);
   }
   else if(token){
