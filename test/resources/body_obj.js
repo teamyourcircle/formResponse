@@ -29,6 +29,25 @@ exports.newformResponse = {
         }]
     ]
 }
+exports.activeOAuthRes = {
+    "_id": "60bde569fadfff0a6a8203ad",
+    "social_id": "109517401515895928040",
+    "oauth_provider": "google",
+    "access_token": "access - token",
+    "user": "60b91f6dee3e746a0b550e96",
+    "email": "kumarnitesh2000.nk@gmail.com",
+    "integration_id": "google-sheets",
+    "refresh_token": "refresh - token",
+    "__v": 0,
+    "additional_info": {
+      "118": {
+        "spreadsheet_id": "1yLaVLlZAJGG0dcQQ8BZMmoWt0NhjeMi28r9ereAVRQo",
+        "sheetId": 977964886,
+        "deleted": false
+      },
+      "key": "val"
+    }
+  }
 
 exports.newformTemplate={
     template:{
@@ -58,6 +77,53 @@ exports.formResponse_1 = {
         }]
     ]
 }
+exports.formArray = [
+    {
+        form_id: '118',
+        section_list: [
+            [{
+                is_choice:true,
+                gender: {
+                    male: 0,
+                    female: 1
+                }
+            },{
+                is_choice:false,
+                name: "nitesh"
+            }]
+        ]
+    },
+    {
+        form_id: '20',
+        section_list: [
+            [{
+                is_choice:true,
+                gender: {
+                    male: 0,
+                    female: 1
+                }
+            },{
+                is_choice:false,
+                name: "nitesh"
+            }]
+        ]
+    },
+    {
+        form_id: '111',
+        section_list: [
+            [{
+                is_choice:true,
+                gender: {
+                    male: 0,
+                    female: 1
+                }
+            },{
+                is_choice:false,
+                name: "nitesh"
+            }]
+        ]
+    }
+]
 //user info by token
 exports.userInfo = {
     email: 'kumarnitesh@mail.com',
@@ -93,6 +159,12 @@ exports.myForms = {
         "form_id": 420,
         "init": "12/03/2021 | 17:44 PM",
         "end": "14/04/2021 | 08:19 AM"
+      },
+      {
+        "form_title": "test Form",
+        "form_id": 111,
+        "init": "12/03/2021 | 17:44 PM",
+        "end": "14/04/2021 | 08:19 AM"
       }
     ]
 }
@@ -125,7 +197,149 @@ exports.consumerResponse = {
     ],
     "formId": 118
 }
+exports.consumerPayloadSheet = `{"formId":"118","responseBy":"60b91f6dee3e746a0b550e96","sections":[[{"is_choice":false,"name":"ritu"},
+{"is_choice":true,"gender":{"male":0,"female":1}}]]}` 
 
 exports.formTemplatedeleteRes = {'status':'done','id':20}
 
 exports.formTemplate = {"template": {"form": {"form_title": "sheet Form", "form_description": "Description Section"}, "section": {"section_title": ["Section Title"], "section_description": [""], "section_fields": [2]}, "field": {"field_description": ["", ""], "field_label": ["name", "gender"], "field_type_list": [{"field_type": "text", "index": 0, "options": [], "required": false, "plugins": []}, {"field_type": "choice", "index": 1, "options": ["male", "female"], "required": false, "plugins": []}]}, "form_info": {"form_title": "sheet Form", "form_id": 420, "init": "12/03/2021 | 17:44 PM", "end": "14/04/2021 | 08:19 AM"}}};
+
+exports.integrationList = {
+    "integartionList": [
+      {
+        "_id": "",
+        "social_id": "",
+        "oauth_provider": "google",
+        "access_token": "",
+        "user": "",
+        "email": "hardik@mail.com",
+        "integration_id": "google-sheets",
+        "refresh_token": "",
+        "__v": 0,
+        "additional_info": {
+            "111": {
+              "spreadsheet_id": "",
+              "sheetId": 007
+            }
+          }
+      }
+    ]
+  };
+
+exports.integartionListWithoutAdditionInfo = {
+    "integartionList": [
+      {
+        "_id": "",
+        "social_id": "",
+        "oauth_provider": "google",
+        "access_token": "",
+        "user": "",
+        "email": "hardik@mail.com",
+        "integration_id": "google-sheets",
+        "refresh_token": "",
+        "__v": 0,
+      }
+    ]
+  };
+
+exports.googleSheetResponse = {
+    url: "",
+    sheet_info: {
+        spreadsheet_id:"",
+        sheeId:"",
+    },
+    supportive_email: "hardik@gmail.com",
+    status: 200,
+};
+exports.createSheetResponse = {
+    url: "",
+    sheet_info: {
+        spreadsheet_id:"",
+        sheeId:"",
+    },
+    supportive_email: "niteshdipg@mail.com",
+    status: 200,
+}
+exports.formResponseArray = [
+    {
+    "_id": "606af26e0b77321ae8eac21a",
+    "sections": [
+        [
+        {
+            "is_choice": false,
+            "name": "Hardik"
+        },
+        {
+            "is_choice": false,
+            "mob": "646546"
+        },
+        {
+            "is_choice": true,
+            "occupasion": {
+            "student": true,
+            "business": 0
+            }
+        },
+        {
+            "is_choice": true,
+            "gender": {
+            "male": 1,
+            "female": 0
+            }
+        }
+        ]
+    ],
+    "formId": 111,
+    "responseBy": "hardikshah.hs2015@gmail.com",
+    "__v": 0
+    },
+    {
+    "_id": "606af29b0b77321ae8eac21b",
+    "sections": [
+        [
+        {
+            "is_choice": false,
+            "name": "Nitesh "
+        },
+        {
+            "is_choice": false,
+            "mob": "4651531"
+        },
+        {
+            "is_choice": true,
+            "occupasion": {
+            "student": true,
+            "business": true
+            }
+        },
+        {
+            "is_choice": true,
+            "gender": {
+            "male": 1,
+            "female": 0
+            }
+        }
+        ]
+    ],
+    "formId": 111,
+    "responseBy": "hardikshah.hs2015@gmail.com",
+    "__v": 0
+    }
+]
+
+exports.sheetFunctionalityResource = {
+    my_formData:{
+    "name":["now","sss","nitesh kumar and now","empire","now","lol","lol","djdjjdjd","niteshkumartestsuhail","anmol","gfg","gfg","ddd"],
+    "gender":[{"male":1,"female":0},{"male":1,"female":0},{"male":1,"female":0},{"male":1,"female":0},{"male":0,"female":1},{"male":1,"female":0},{"male":1,"female":0},{"male":1,"female":0},{"male":1,"female":0},{"male":1,"female":0},{"male":1,"female":0},{"male":1,"female":0},{"male":1,"female":0}]
+    },
+    COLUMNS: ["name","gender"],
+    sheetId: "3434219"
+}
+  
+exports.createSheetBody = {
+    client_id:"dummy_client_id",
+    client_secret:"dummy_client_secret",
+    redirect_uri:"http://localhost:3000",
+    formId: 111,
+    supportive_email:'hardik@mail.com',
+}

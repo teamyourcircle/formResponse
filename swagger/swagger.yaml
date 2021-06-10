@@ -402,8 +402,7 @@ definitions:
       - client_id
       - client_secret
       - redirect_uri
-      - form_id
-      - refresh_token
+      - formId
       - supportive_email
     properties:
       client_id:
@@ -416,11 +415,8 @@ definitions:
       redirect_uri:
         type: string
         description: google redirect uri
-      form_id:
+      formId:
         type: string
-      refresh_token:
-        type: string
-        description: google refresh_token
       supportive_email:
         type: string
         description: Supportive email address
@@ -437,35 +433,22 @@ definitions:
         type: string
         description: >
           Your form ID
-  switch:
-    required:
-      - switch_to
-      - switch_from
-      - form_id
-    properties:
-      switch_to:
-        type: string
-      switch_from:
-        type: string
-      form_id:
-        type: string
-        description: form ID
-parameters:
-  access_token: &access_token
-    name: access-token
-    in: header
-    type: string
-  consumer_queue_body: &consumer_queue_body
-    name: body
-    in: body
-    schema:
-      type: object
-      properties:
-        queueName:
-          type: string
-        formId:
-          type: string
-  api_key: &api_key
+parameters: 
+    access_token: &access_token
+      name: access-token
+      in: header
+      type: string
+    consumer_queue_body: &consumer_queue_body
+      name: body
+      in: body
+      schema:
+          type: object
+          properties:
+            queueName:
+              type: string          
+            formId:
+              type: string
+    api_key: &api_key
     name: api-key
     in: header
     type: string

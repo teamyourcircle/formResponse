@@ -5,6 +5,7 @@ const apiUtils = require('../util/apiUtils');
 const sheets = google.sheets('v4')
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
+var nodeBase64 = require('nodejs-base64-converter');
 var open = require('amqplib').connect(config.RABBIT_MQ_URL);
 const google_sheet = async (queue, isNoAck = false, durable = false, prefetch = null) => {
 // Consumer
@@ -35,7 +36,11 @@ let document_info = {};
  * @param {*} payload 
  */
 const add_row_to_sheet = (auth,payload) =>{
-    const spreadsheetId = document_info['spreadsheet_id'];
+    logger.debug('add row to google sheet');
+    const formId = JSON.parse(payload)['formId'];
+    const spreadsheetId = document_info['additional_info'][formId]['spreadsheet_id'];
+    logger.debug(`adding rows to spreadsheetId ${spreadsheetId}`);
+    let value = payload_expand(payload);
     sheets.spreadsheets.values.append({
         spreadsheetId: spreadsheetId,
         range: "A:B",
@@ -43,26 +48,66 @@ const add_row_to_sheet = (auth,payload) =>{
         insertDataOption: 'INSERT_ROWS',
         resource: {
           values: [
-            payload_expand(payload)
+            value
           ],
         },
         auth: auth
       }, (err, response) => {
-        if (err) return 
+        if (err){
+            logger.error(err);
+        }
         else if(response){
-            
+            logger.debug('row added to google sheet successfully');
+            logger.debug(response.config.body);
         }
       })
 }
+
+/**
+ * get client ids and secrets for apps
+ */
+const get_credentials = () => {
+    logger.debug('inside get_credentials function');
+    let base64encode = nodeBase64.encode(`${config.basic_auth_username}:${config.basic_auth_password}`);
+    let url = apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL,"/auth/api/oauth/credentials");
+    return new Promise(function(resolve, reject){
+        fetch(url,{
+            headers: {
+                Authorization: `Basic ${base64encode}`
+            }
+        })
+        .then(res=>res.json())
+        .then(data =>{
+            if(!data.error){
+                resolve(data);
+            }
+            else{
+                reject(data.error);
+            }
+        })
+        .catch(err =>{
+            reject(err);
+        })
+    })
+}
+
 /**
  * this will do authorization process
  * @param {*} integration_id 
- * @param {*} supportive_email 
  * @param {*} payload
  */
 const prepare_the_auth_sheet = (integration_id, payload) =>{
+    logger.debug('inside prepare_the_auth_sheet');
     const formId = JSON.parse(payload)['formId'];
-    authorize(add_row_to_sheet, formId, integration_id, payload);
+    logger.debug(`prepare the auth for formId: ${formId}`);
+    get_credentials()
+    .then(credentials =>{
+        authorize(add_row_to_sheet, formId, integration_id, payload,credentials)
+    })
+    .catch(err=>{
+        logger.error(err);
+        logger.error('not able to add row in sheet');
+    })
 }
 
 /**
@@ -72,11 +117,13 @@ const prepare_the_auth_sheet = (integration_id, payload) =>{
  * @param {*} integration_id 
  * @param {*} payload
  */
-const authorize = (callback, formId, integration_id,payload) => {
+const authorize = (callback, formId, integration_id,payload,credentials) => {
+    logger.debug('authorization process init with google');
+    const {google_client_id, google_client_secret, google_redirect_uri} = credentials;
     const oAuth2Client = new google.auth.OAuth2(
-      env.client_id,
-      env.client_secret,
-      env.redirect_uri
+    google_client_id,
+    google_client_secret,
+    google_redirect_uri
     );
     set_integration_doc(formId,integration_id)
     .then(() => {
@@ -84,7 +131,7 @@ const authorize = (callback, formId, integration_id,payload) => {
         callback(oAuth2Client,payload);
     })
     .catch(err =>{
-        logger.err('not able to authorize from google :: '+err);
+        logger.error('not able to authorize from google :: '+err);
     })
 }
 
@@ -94,46 +141,38 @@ const authorize = (callback, formId, integration_id,payload) => {
  * @param {*} integrationId 
  */
 const set_integration_doc = (formId,integrationId)=>{
+    logger.debug('set the token of active account for integrationId: '+integrationId);
+    let base64encode = nodeBase64.encode(`${config.basic_auth_username}:${config.basic_auth_password}`);
+    let url = apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL,`/auth/api/oauth/active/${integrationId}?key=${formId}`);
     return new Promise((resolve,reject)=>{
-    const url = apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL,`/auth/api/all/oauthApps?integration_id=${integrationId}`)    
-    fetch(url)
-    .then(res => res.json())
-    .then(data => {
-        if(data.integartionList.length){
-            document_info = filter_doc(data.integartionList,formId);
-            resolve();
-        }
+        fetch(url,{
+            headers: {
+                Authorization: `Basic ${base64encode}`,
+                accept: "application/json"
+            }
+        })
+        .then(res=>res.json())
+        .then(data =>{
+            if(!data.error){
+                logger.debug('documet info fetched');
+                document_info = data;
+                resolve(data);
+            }
+            else{
+                reject(data.error);
+            }
+        })
+        .catch(err =>{
+            reject(err);
+        })
     })
-    .catch(err => {
-        logger.error('no additional info found :: '+err);
-        reject(err);
-    })
-    })
-    
-}
-
-/**
- * search which doc contain additional info with formId as property
- * @param {*} integration_arr 
- * @param {*} formId 
- */
-const filter_doc = (integration_arr, formId) => {
-    let doc_body = {};
-    integration_arr.map(i => {
-        if(i['additional_info']!=undefined && i['additional_info'][formId]!=undefined && !i['additional_info'][formId].deleted)
-        {   
-            doc_body['refresh_token'] = i['refresh_token'];
-            doc_body['spreadsheet_id'] = i['additional_info'][formId]['spreadsheet_id'];
-            doc_body['sheetId'] = i['additional_info'][formId]['sheetId'];
-        }
-    })
-    return doc_body;
 }
 /**
  * this will decode the payload
  * @param {*} payload 
  */
 const payload_expand = (payload) =>{
+    logger.debug(`formatting the payload`);
     let value = [];
     const sections = JSON.parse(payload).sections;
     sections.map(s => {
@@ -160,3 +199,6 @@ const get_choices = (obj) => {
     }
     return val.join();
 }
+module.exports.get_choices = get_choices;
+module.exports.payload_expand = payload_expand;
+module.exports.set_integration_doc = set_integration_doc;

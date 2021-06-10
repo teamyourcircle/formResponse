@@ -37,9 +37,9 @@ const check_form_author = (req, res, next) => {
         })
         .then(data => {
             logger.debug('forms info fetched');
-            req.formData = data.form;
             const is_validate = validate_form_created_by_current_user(data.form,formId);
             if(is_validate.length){
+                req.formData = is_validate;
                 return Promise.resolve();
             }else{
                 logger.error(`form ${formId} :: not created by user`);
