@@ -6,8 +6,6 @@ const sheets = google.sheets('v4')
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 var nodeBase64 = require('nodejs-base64-converter');
-const { debug } = require('../util/logger');
-const { credentials } = require('amqplib');
 var open = require('amqplib').connect(config.RABBIT_MQ_URL);
 const google_sheet = async (queue, isNoAck = false, durable = false, prefetch = null) => {
 // Consumer
@@ -42,6 +40,7 @@ const add_row_to_sheet = (auth,payload) =>{
     const formId = JSON.parse(payload)['formId'];
     const spreadsheetId = document_info['additional_info'][formId]['spreadsheet_id'];
     logger.debug(`adding rows to spreadsheetId ${spreadsheetId}`);
+    let value = payload_expand(payload);
     sheets.spreadsheets.values.append({
         spreadsheetId: spreadsheetId,
         range: "A:B",
@@ -49,7 +48,7 @@ const add_row_to_sheet = (auth,payload) =>{
         insertDataOption: 'INSERT_ROWS',
         resource: {
           values: [
-            payload_expand(payload)
+            value
           ],
         },
         auth: auth
@@ -58,7 +57,8 @@ const add_row_to_sheet = (auth,payload) =>{
             logger.error(err);
         }
         else if(response){
-            logger.debug(response);
+            logger.debug('row added to google sheet successfully');
+            logger.debug(response.config.body);
         }
       })
 }
@@ -199,10 +199,6 @@ const get_choices = (obj) => {
     }
     return val.join();
 }
-/*
-// write test for this function
-let integ_id = 'google-sheets';
-let payload = `{"formId":"118","responseBy":"60b91f6dee3e746a0b550e96","sections":[[{"is_choice":false,"name":"gfg"},
-{"is_choice":true,"gender":{"male":1,"female":0}}]]}` 
-prepare_the_auth_sheet(integ_id,payload);
-*/
+module.exports.get_choices = get_choices;
+module.exports.payload_expand = payload_expand;
+module.exports.set_integration_doc = set_integration_doc;
