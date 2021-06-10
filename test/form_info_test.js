@@ -97,7 +97,7 @@ describe('test for delete forms footprint',function (done) {
             })
         })
     })
-    it('should delete consumers+responses of deleted form',function (done) {
+    it('should delete consumers+responses of deleted form using access-token',function (done) {
         nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/dashboard')
         .reply(HttpStatus.OK,bodyObj.userInfo);
         nock(config.FORM_SERVICE_BASE_URL).get(`/forms/delete/${body.formId}`)
