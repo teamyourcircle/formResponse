@@ -1,4 +1,4 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
   title: Form Public Routes
   description: Apis for FormService Public EndPoints
@@ -22,14 +22,10 @@ paths:
     get:
       summary: Returns The array of forms created by user whose api key is mentioned
       parameters:
-        - $ref: '#/parameters/access_token'
-        - in: query
-          name: key
-          required: false
-          type: string
-          description: mention your api_key
+        - $ref: "#/parameters/access_token"
+        - $ref: "#/parameters/api_key"
       description: >-
-         So this Api Simply Returns The array of forms created by user whose api key is mentioned 
+        So this Api Simply Returns The array of forms created by user whose api key is mentioned
       produces:
         - application/json
       responses:
@@ -44,17 +40,13 @@ paths:
                 type: string
                 example: Token not recognized
         default:
-          description: Unexpected error 
+          description: Unexpected error
   /forms/delete:
     delete:
       summary: Delete the form-template as well as form-responses by id
       parameters:
-        - $ref: '#/parameters/access_token'
-        - in: query
-          name: key
-          required: false
-          type: string
-          description: mention your api_key
+        - $ref: "#/parameters/access_token"
+        - $ref: "#/parameters/api_key"
         - in: body
           name: formId
           required: true
@@ -63,9 +55,9 @@ paths:
             properties:
               formId:
                 type: integer
-          description: mention your form_id 
+          description: mention your form_id
       description: >-
-         So this Api Delete the form-template as well as form-responses by id 
+        So this Api Delete the form-template as well as form-responses by id
       produces:
         - application/json
       responses:
@@ -73,8 +65,8 @@ paths:
           description: Deleted
           schema:
             type: object
-            properties: 
-              status: 
+            properties:
+              status:
                 type: string
                 example: Deleted
         401:
@@ -86,22 +78,22 @@ paths:
                 type: string
                 example: Token not recognized
         404:
-          description: form-template not found      
+          description: form-template not found
         default:
-          description: Unexpected error          
+          description: Unexpected error
 
   /submit/response:
     post:
       summary: Submit form responses by form_id and section list
       parameters:
-        - $ref: '#/parameters/access_token'
+        - $ref: "#/parameters/access_token"
         - in: body
           name: body
           schema:
-            $ref: '#/definitions/submitResponse'
+            $ref: "#/definitions/submitResponse"
           required: true
       description: >-
-         This api allows you to submit responses with your access token , form_id and your response
+        This api allows you to submit responses with your access token , form_id and your response
       produces:
         - application/json
       responses:
@@ -116,7 +108,7 @@ paths:
                 type: string
                 example: Token not recognized
         404:
-          description: form with given formId not found 
+          description: form with given formId not found
           schema:
             type: object
             properties:
@@ -124,26 +116,22 @@ paths:
                 type: string
                 example: Not Found Error
         500:
-          description: Internal Server Error      
+          description: Internal Server Error
         default:
           description: Unexpected error
   /get/responses:
     get:
       summary: Get all the responses of form by formId
       parameters:
-        - $ref: '#/parameters/access_token'
-        - in: query
-          name: key
-          required: false
-          type: string
-          description: mention your api_key
+        - $ref: "#/parameters/access_token"
+        - $ref: "#/parameters/api_key"
         - in: query
           name: formId
           required: true
           type: integer
-          description: mention your form_id 
+          description: mention your form_id
       description: >-
-         So this Api Get all the responses of form by formId 
+        So this Api Get all the responses of form by formId
       produces:
         - application/json
       responses:
@@ -158,7 +146,7 @@ paths:
                 type: string
                 example: Token not recognized
         404:
-          description: form with given formId not found 
+          description: form with given formId not found
           schema:
             type: object
             properties:
@@ -166,18 +154,18 @@ paths:
                 type: string
                 example: Not Found Error
         500:
-          description: Internal Server Error      
+          description: Internal Server Error
         default:
           description: Unexpected error
   /oauth/createSheets:
     post:
       summary: "Create Google SpreadSheet by giving ClientID, ClientSecret, RedirectURL and Refresh-token"
       parameters:
-        - $ref: '#/parameters/access_token'
+        - $ref: "#/parameters/access_token"
         - in: body
           name: body
-          schema: 
-            $ref: '#/definitions/googleOauthClient'
+          schema:
+            $ref: "#/definitions/googleOauthClient"
           required: true
         - in: query
           name: key
@@ -185,13 +173,13 @@ paths:
           type: string
           description: mention your api_key
       description: >-
-         This Api will create new Google SpreadSheet with your Google account credentials 
+        This Api will create new Google SpreadSheet with your Google account credentials
       produces:
-        -  application/json
+        - application/json
       responses:
         200:
           description: OK
-        401: 
+        401:
           description: key is not Authorized
           schema:
             type: object
@@ -215,14 +203,15 @@ paths:
     delete:
       summary: Delete response of a form created by current user
       parameters:
-        - $ref: '#/parameters/access_token'
+        - $ref: "#/parameters/access_token"
+        - $ref: "#/parameters/api_key"
         - in: body
           name: body
-          schema: 
-            $ref: '#/definitions/deleteResponse'
+          schema:
+            $ref: "#/definitions/deleteResponse"
           required: true
       description: >-
-         So this API will delete the response from given form
+        So this API will delete the response from given form
       produces:
         - application/json
       responses:
@@ -237,7 +226,7 @@ paths:
                 type: string
                 example: Token not recognized
         404:
-          description: form with given formId not found 
+          description: form with given formId not found
           schema:
             type: object
             properties:
@@ -245,31 +234,27 @@ paths:
                 type: string
                 example: Not Found Error
         500:
-          description: Internal Server Error      
+          description: Internal Server Error
         default:
           description: Unexpected error
   /get/response/{responseId}:
     get:
       summary: Get particular response by giving responseId
       parameters:
-        - $ref: '#/parameters/access_token'
-        - in: query
-          name: key
-          required: false
-          type: string
-          description: mention your api_key
+        - $ref: "#/parameters/access_token"
+        - $ref: "#/parameters/api_key"
         - in: query
           name: formId
           required: true
           type: string
-          description: mention formId   
+          description: mention formId
         - in: path
           name: responseId
           required: true
           type: string
-          description: mention responseId 
+          description: mention responseId
       description: >-
-         So this Api Get particular response by giving responseId 
+        So this Api Get particular response by giving responseId
       produces:
         - application/json
       responses:
@@ -292,28 +277,28 @@ paths:
                 type: string
                 example: Not Found Error
         500:
-          description: Internal Server Error      
+          description: Internal Server Error
         default:
           description: Unexpected error
   /get/consumers:
     get:
       summary: get all the consumers attached to the form
       parameters:
-        - $ref: '#/parameters/access_token'
+        - $ref: "#/parameters/access_token"
         - in: query
           name: formId
           required: true
           type: string
-          description: mention formId 
+          description: mention formId
       responses:
         200:
-          description: OK    
+          description: OK
         404:
           description: Not Found
   /get/all/consumers:
     get:
       summary: get all the consumers
-      parameters: 
+      parameters:
         - in: query
           name: tags
           required: false
@@ -321,32 +306,32 @@ paths:
           description: mention tags separated with comma
       responses:
         200:
-          description: OK    
+          description: OK
         404:
-          description: Not Found        
+          description: Not Found
   /update/consumers:
     put:
       summary: add the consumers attached to the form
       parameters:
-        - $ref: '#/parameters/access_token'
-        - $ref: '#/parameters/consumer_queue_body'
+        - $ref: "#/parameters/access_token"
+        - $ref: "#/parameters/consumer_queue_body"
       responses:
         200:
-          description: OK    
+          description: OK
         404:
-          description: Not Found  
+          description: Not Found
   /remove/consumers:
     delete:
       summary: remove the consumers attached to the form
       parameters:
-        - $ref: '#/parameters/access_token'
-        - $ref: '#/parameters/consumer_queue_body'
+        - $ref: "#/parameters/access_token"
+        - $ref: "#/parameters/consumer_queue_body"
       responses:
         200:
-          description: OK    
+          description: OK
         404:
-          description: Not Found        
-definitions: 
+          description: Not Found
+definitions:
   submitResponse:
     required:
       - form_id
@@ -355,11 +340,11 @@ definitions:
       form_id:
         type: string
         description: form_id
-      section_list :
+      section_list:
         type: array
-        items: 
+        items:
           type: array
-          items: 
+          items:
             type: object
         description: response here
 
@@ -399,18 +384,22 @@ definitions:
         type: string
         description: >
           Your form ID
-parameters: 
-    access_token: &access_token
-      name: access-token
-      in: header
-      type: string
-    consumer_queue_body: &consumer_queue_body
-      name: body
-      in: body
-      schema:
-          type: object
-          properties:
-            queueName:
-              type: string          
-            formId:
-              type: string
+parameters:
+  access_token: &access_token
+    name: access-token
+    in: header
+    type: string
+  consumer_queue_body: &consumer_queue_body
+    name: body
+    in: body
+    schema:
+      type: object
+      properties:
+        queueName:
+          type: string
+        formId:
+          type: string
+  api_key: &api_key
+    name: api-key
+    in: header
+    type: string
