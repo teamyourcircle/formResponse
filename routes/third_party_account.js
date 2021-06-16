@@ -1,5 +1,9 @@
 const express = require('express');
 const router=express.Router();
+const { google } = require('googleapis');
+var async = require("async");
+const path = require('path');
+const fs = require('fs');
 const fetch = require('node-fetch');
 const HttpStatus = require('http-status-codes');
 const env = process.env.NODE_ENV || 'development';
@@ -9,6 +13,7 @@ const oauth_sheet_helper = require('../util/oauth_sheet_helper');
 const logger = require('../util/logger');
 const check_form_author = require('../middleWareFun/check_form_author');
 const errorMessages = require('../util/errorMessages');
+const globalConstant = require('../util/globalConstant');
 
 /**
  * create google sheet with form data
@@ -162,3 +167,86 @@ router.put("/put/switch/:integrationId", (req, res) => {
     res.status(HttpStatus.UNAUTHORIZED).json(apiUtils.getResponse(message+err,HttpStatus.UNAUTHORIZED))
   } 
 });
+
+router.post('/oauth/createFolder', (req, res) => {
+  logger.debug('inside oauth create folder');
+  const { supportive_email, path, integration_id, oauth_provider } = req.body;
+  const token = req.headers['access-token'];
+  const oauth_token;
+  const message;
+  switch (integration_id){
+    case globalConstant.GOOGLE_DRIVE:
+      logger.debug('google drive coming soon');
+      
+      const oauth2Client = new google.auth.OAuth2(
+        CLIENT_ID,
+        CLIENT_SECRET,
+        REDIRECT_URI
+      );
+      oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+      const drive = google.drive({
+        version: 'v3',
+        auth: oauth2Client,
+      });
+      break;
+    case globalConstant.DROP_BOX:
+      const url = `/auth/api/refreshoauthAccess`;
+      const options = {
+        method: 'PUT',
+        headers: {
+          'access-token': token,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          oauth_provider,
+          integration_id,
+          supportive_email
+        })
+      }
+      logger.debug('hit request to refresh access-token')
+      fetch(url,options)
+      .then(resp => resp.json())
+      .then(data => {
+        if(data && data["integration"] && data.integration["access_token"]) {
+          logger.debug('new access token fetched');
+          oauth_token = data.integration['access_token'];
+        }
+        if(oauth_token) {
+          logger.debug('hit request on drop_box')
+          return dropboxV2Api.authenticate({ token: oauth_token });
+        }
+        else {
+          message='access token not fected';
+          logger.debug(message)
+          return Promise.reject(message);
+        }
+      })
+      .then(dropbox => {
+        dropbox({
+          resource: 'files/create_folder_v2',
+           parameters: {
+            "path": path,
+            "autorename": false
+          }
+        }, (err, result, response) => {
+          if (err) {
+            message = `folder not created :: Error : ${err}`;
+            logger.debug(message);
+            return Promise.reject(message); 
+          }
+          logger.debug('folder created');
+          return res.json({ 'folder_id': result});
+        });
+      })
+      .catch(err => {
+        logger.error(errorMessages.INTERNAL_SERVER_ERROR+err);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(apiUtils.getResponse(errorMessages.INTERNAL_SERVER_ERROR+err,HttpStatus.INTERNAL_SERVER_ERROR))
+      })
+      break;
+    default:
+      message = 'invalid integration found';
+      logger.debug(message);
+      return Promise.reject(message)
+  }
+})
