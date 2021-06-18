@@ -4,6 +4,7 @@ const { google } = require('googleapis');
 var async = require("async");
 const path = require('path');
 const fs = require('fs');
+const dropboxV2Api = require('dropbox-v2-api');
 const fetch = require('node-fetch');
 const HttpStatus = require('http-status-codes');
 const env = process.env.NODE_ENV || 'development';
@@ -14,6 +15,7 @@ const logger = require('../util/logger');
 const check_form_author = require('../middleWareFun/check_form_author');
 const errorMessages = require('../util/errorMessages');
 const globalConstant = require('../util/globalConstant');
+const credential_provider = require('../middleWareFun/credential_provider');
 
 /**
  * create google sheet with form data
@@ -168,29 +170,31 @@ router.put("/put/switch/:integrationId", (req, res) => {
   } 
 });
 
-router.post('/oauth/createFolder', (req, res) => {
+router.post('/oauth/createFolder',credential_provider, (req, res) => {
   logger.debug('inside oauth create folder');
   const { supportive_email, path, integration_id, oauth_provider } = req.body;
   const token = req.headers['access-token'];
-  const oauth_token;
-  const message;
+  let oauth_token='';
+  let message='';
   switch (integration_id){
     case globalConstant.GOOGLE_DRIVE:
       logger.debug('google drive coming soon');
-      
+      const { google_client_id, google_client_secret, google_redirect_uri } = req.body.credentials;
       const oauth2Client = new google.auth.OAuth2(
-        CLIENT_ID,
-        CLIENT_SECRET,
-        REDIRECT_URI
+        google_client_id,
+        google_client_secret,
+        google_redirect_uri
       );
       oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
       const drive = google.drive({
         version: 'v3',
         auth: oauth2Client,
       });
+
+      
       break;
     case globalConstant.DROP_BOX:
-      const url = `/auth/api/refreshoauthAccess`;
+      const url = `${config.AUTH_SERVICE_BASE_URL}/auth/api/refreshoauthAccess`;
       const options = {
         method: 'PUT',
         headers: {
@@ -224,7 +228,7 @@ router.post('/oauth/createFolder', (req, res) => {
       })
       .then(dropbox => {
         dropbox({
-          resource: 'files/create_folder_v2',
+          resource: 'files/create_folder',
            parameters: {
             "path": path,
             "autorename": false
@@ -235,8 +239,8 @@ router.post('/oauth/createFolder', (req, res) => {
             logger.debug(message);
             return Promise.reject(message); 
           }
-          logger.debug('folder created');
-          return res.json({ 'folder_id': result});
+          logger.debug('folder created with id :: '+result.metadata.id);
+          return res.json({ 'folder_info': result.metadata});
         });
       })
       .catch(err => {
@@ -250,3 +254,5 @@ router.post('/oauth/createFolder', (req, res) => {
       return Promise.reject(message)
   }
 })
+
+module.exports = router;
