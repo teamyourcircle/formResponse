@@ -13,16 +13,16 @@ const apiUtils = require('../util/apiUtils');
 const oauth_sheet_helper = require('../util/oauth_sheet_helper');
 const logger = require('../util/logger');
 const check_form_author = require('../middleWareFun/check_form_author');
+const refresh_token_provider = require('../middleWareFun/refresh_token_provider');
 const errorMessages = require('../util/errorMessages');
 const globalConstant = require('../util/globalConstant');
 const credential_provider = require('../middleWareFun/credential_provider');
-const oauth_folder_helper = require('../util/oauth_folder_helper');
 
 /**
  * create google sheet with form data
  * @param {*} formId
  */
-router.post("/oauth/createSheets",check_form_author, (req, res) => {
+router.post("/oauth/createSheets",[check_form_author,refresh_token_provider], (req, res) => {
   logger.debug('inside oauth create sheet');
   var flag = false;
   var email=req.body.supportive_email;
@@ -30,9 +30,9 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
   var choiceresponseSummary = {};
   var formResponseArray=[];
   var userFormData;
-  const formId = req.body.form_id;
+  const formId = req.body.formId;
   const token = req.headers['access-token'];
-  var url = apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL, `/get/responses?formId=${formId}`);
+  var url = apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL, `/form/api/get/responses?formId=${formId}`);
   var options = {
     method: 'GET',
     headers: {
@@ -42,13 +42,12 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
     }
   }
   fetch(url, options)
-  .then(() => {
-    logger.debug('connecting user with third-party app')
-    formResponseArray=req.formData;
-    url=apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL, '/user/oauthApps');
-    return fetch(url, options)
-  })
   .then(res => res.json())
+  .then(formData => {
+    logger.debug('connecting user with third-party app')
+    formResponseArray=formData.responseArray;
+    return Promise.resolve(req.oauthBody);
+  })
   .then(data => {
     if(data.msg){
       logger.debug('data forbidden error');
@@ -57,12 +56,10 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
     logger.debug('checking pre-existing sheet')
     var responseJSON = oauth_sheet_helper.sheetUsercheck(formId, data, email, flag);
     if(responseJSON.status == HttpStatus.OK) {
-      logger.debug('sheet found');
+      logger.debug('sheet found, exiting');
       flag=true;
-      return res.status(HttpStatus.OK).json(responseJSON);
+      return Promise.reject(responseJSON)
     }
-  })
-  .then(() => {
     if(!flag){
       logger.debug('traversing response data');
       for(var i=0;i<formResponseArray.length;i++){
@@ -83,95 +80,33 @@ router.post("/oauth/createSheets",check_form_author, (req, res) => {
         })
       }
       userFormData = {...responseSummary,...choiceresponseSummary};
-      return Promise.resolve();
-    }
-    else{
-      let message = 'Something went wrong';
-      logger.error(message);
-      return Promise.reject(message);
+      return Promise.resolve(userFormData);
     }
   })
-  .then(() => {
+  .then((sheetFormatData) => {
     logger.debug('creating sheet');
-    var sheetResponse = oauth_sheet_helper.sheetCreator(req.body, formResponseArray[0]);
-    if(sheetResponse.status==HttpStatus.OK){
+    return oauth_sheet_helper.sheetCreator(req.body, sheetFormatData, req);
+  })
+  .then(status => {
+    if(status.status==HttpStatus.OK){
       logger.debug('sheet created successfully');
-      res.status(HttpStatus.OK).json({ sheetResponse });
+      res.status(HttpStatus.OK).json(status);
     }
     else{
-      logger.debug(sheetResponse.message);
-      return Promise.reject(sheetResponse.message);
+      logger.debug(status);
+      return Promise.reject(status);
     }
   })
   .catch(err =>{
-    logger.error('sheet cannot be created '+err);
-    res.status(HttpStatus.FORBIDDEN).json(apiUtils.getResponse('sheet cannot be created '+err,HttpStatus.FORBIDDEN))
+    logger.error('sheet cannot be created');
+    res.status(HttpStatus.FORBIDDEN).json({ 
+      'message': 'new sheet cannot be created :: '+err,
+      'error' : err
+     })
   })
-})
-
-
-router.put("/put/switch/:integrationId", (req, res) => {
-  logger.debug('inside swictch integration');
-  const token = req.headers['access-token'];
-  const {switch_from,switch_to,form_id} = req.body;
-  const {integrationId} = req.params;
-  let delete_flag=false;
-  if(switch_to && form_id){
-    logger.debug('fetching access switch_to user');
-    let headerData={
-      method: 'PUT',
-      headers: {
-        'access-token': token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'supportive_email': switch_to
-      },
-      body:JSON.stringify({   
-      "property": form_id,
-      "delete_flag": delete_flag
-      })
-    }
-    const endpoint="auth/api/oauth/edit/account/";
-    const url=config.AUTH_SERVICE_BASE_URL+endpoint+integrationId
-    fetch(url,headerData)
-    .then(res => res.status)
-    .then(status => {
-      logger.debug('check switch_to status');
-      if(status==HttpStatus.OK){
-        logger.debug('fetching access switch_from user');
-        headerData.body["delete_flag"]=true;
-        headerData.headers['supportive_email']=switch_from;
-        return fetch(url,headerData)
-      }
-      else {
-        logger.debug('delete not setted')
-        return Promise.reject(errorMessages.DELETE_NOT_SET);
-      }
-    })
-    .then(res => res.status)
-    .then(status=>{
-      logger.debug('check switch_from status');
-      if(status==HttpStatus.OK){
-        let message='access switched';
-        logger.debug(message);
-        res.status(HttpStatus.OK).json({message});
-      }else{
-        logger.debug(errorMessages.DELETE_NOT_SET);
-        return Promise.reject(errorMessages.DELETE_NOT_SET);
-      }
-    })
-    .catch(err => {
-      logger.error(errorMessages.INTERNAL_SERVER_ERROR+err);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(apiUtils.getResponse(errorMessages.INTERNAL_SERVER_ERROR+err,HttpStatus.INTERNAL_SERVER_ERROR))
-    })
-  }else {
-    let message='unauthorized';
-    logger.debug(message);
-    res.status(HttpStatus.UNAUTHORIZED).json(apiUtils.getResponse(message+err,HttpStatus.UNAUTHORIZED))
-  } 
 });
 
-router.post('/oauth/createFolder',credential_provider, (req, res) => {
+router.post('/oauth/createFolder',[credential_provider, refresh_token_provider], (req, res) => {
   logger.debug('inside oauth create folder');
   const { supportive_email, path, integration_id, oauth_provider } = req.body;
   const token = req.headers['access-token'];
@@ -180,49 +115,38 @@ router.post('/oauth/createFolder',credential_provider, (req, res) => {
   let options={};
   switch (integration_id){
     case globalConstant.GOOGLE_DRIVE:
-      url = `${config.AUTH_SERVICE_BASE_URL}/auth/api/user/oauthApps/byIntegrationId?integration_id=${integration_id}`;
-      const refresh_token='';
-      options = {
-        method: 'GET',
-        headers: {
-          'access-token': token,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      }
-      logger.debug('hit request for refresh token')
-      fetch(url, options)
-      .then(resp => resp.json())
-      .then(data => {
-        if(data && data["integartionList"] && data.integartionList["refresh_token"]) {
-          logger.debug('refresh token fetched');
-          refresh_token = data.integartionList['refresh_token'];
-        }
-        if(refresh_token) {
-          logger.debug('hit request on google_drive')
-          return oauth_folder_helper.createFolder(req.body.credentials, path, refresh_token);
-        }
-        else {
-          message='access token not fected';
-          logger.debug(message)
-          return Promise.reject(message);
-        }
-      })
-      .then(response => {
-        if(response && response["data"]) {
-          logger.debug(`created folder info :: ${response.data}`);
-          return res.json({ "data":response.file });
-        }
-        else {
-          message = `folder not created :: Error : ${response}`;
-          logger.debug(message);
-          return Promise.reject(message); 
-        }
-      })
-      .catch(err => {
-        logger.error(errorMessages.INTERNAL_SERVER_ERROR+err);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(apiUtils.getResponse(errorMessages.INTERNAL_SERVER_ERROR+err,HttpStatus.INTERNAL_SERVER_ERROR))
-      })
+      const { refresh_token } =req;
+      const { google_client_id, google_client_secret, google_redirect_uri } = req.body.credentials;
+      logger.debug('hit google OAuth request');
+      const oauth2Client = new google.auth.OAuth2(
+          google_client_id,
+          google_client_secret,
+          google_redirect_uri
+      );
+      logger.debug('set OAuth credentials');
+      oauth2Client.setCredentials({ refresh_token });
+      const drive = google.drive({
+          version: 'v3',
+          auth: oauth2Client,
+      });
+      var fileMetadata = {
+          'name': path,
+          'mimeType': 'application/vnd.google-apps.folder'
+      };
+      logger.debug('hit drive request for folder creation')
+      drive.files.create({
+      resource: fileMetadata,
+      fields: 'id'
+      }, function (err, file) {
+          if (err) {
+              const message = `folder not created :: Error : ${err}`;
+              logger.debug(message);
+              return Promise.reject(message);
+          } else {
+              logger.debug(`folder created :: ${file}`);
+              return res.json({ "data":file });
+          }
+      });
       break;
     case globalConstant.DROP_BOX:
       let oauth_token='';

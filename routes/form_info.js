@@ -10,11 +10,29 @@ const apiUtils = require('../util/apiUtils');
 const HttpStatus = require('http-status-codes');
 const logger = require('../util/logger');
 const errorMessages = require('../util/errorMessages');
+const globalConstant = require('../util/globalConstant');
 
 router.get('/myforms', (req,res)=>{
   logger.debug('inside my forms');
-  const token = req.headers['access-token'];
-  const url = apiUtils.createUrl(config.FORM_SERVICE_BASE_URL,`/forms/user?token=${token}`);
+  const key=req.headers[globalConstant.KEY];
+  const token=req.headers[globalConstant.TOKEN];
+  let url;
+  if(key){
+    logger.debug(`fetching forms using key`);
+    url = apiUtils.createUrl(config.FORM_SERVICE_BASE_URL,`/forms/user?key=${key}`);
+  }
+  else if(token){
+    logger.debug('fetching forms using token');
+    url = apiUtils.createUrl(config.FORM_SERVICE_BASE_URL,`/forms/user?token=${token}`);
+  }
+  else{
+    logger.error(`unauthorized :: token or key not found`);
+        res.status(HttpStatus.UNAUTHORIZED).send(
+        apiUtils.getError(
+        'unauthorized :: token or key not found',
+        HttpStatus.UNAUTHORIZED))
+  }
+  
   fetch(url)
   .then(res => {
     if(res.status==HttpStatus.OK){

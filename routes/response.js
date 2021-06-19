@@ -9,11 +9,11 @@ const apiUtils = require('../util/apiUtils');
 const errorMessages = require('../util/errorMessages');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
-const verify = require('../middleWareFun/user_info_by_token');
+const verifyByToken = require('../middleWareFun/user_info_by_token');
 const checkResponse=require('../middleWareFun/response_validator')
 
 router.use(express.json());
-router.post("/submit/response", verify,checkResponse,(req,res)=>{
+router.post("/submit/response", verifyByToken,checkResponse,(req,res)=>{
   const {form_id,section_list} = req.body;
   logger.debug(`submitting the response of form : ${form_id}`)  
   const responseBody = {
