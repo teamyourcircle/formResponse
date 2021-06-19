@@ -13,7 +13,7 @@ const apiUtils = require('../util/apiUtils');
 const oauth_sheet_helper = require('../util/oauth_sheet_helper');
 const logger = require('../util/logger');
 const check_form_author = require('../middleWareFun/check_form_author');
-const refresh_token_provider = require('../middleWareFun/refresh_token_provider');
+const integration_provider = require('../middleWareFun/integration_provider');
 const errorMessages = require('../util/errorMessages');
 const globalConstant = require('../util/globalConstant');
 const credential_provider = require('../middleWareFun/credential_provider');
@@ -22,7 +22,7 @@ const credential_provider = require('../middleWareFun/credential_provider');
  * create google sheet with form data
  * @param {*} formId
  */
-router.post("/oauth/createSheets",[check_form_author,refresh_token_provider], (req, res) => {
+router.post("/oauth/createSheets",[check_form_author,integration_provider], (req, res) => {
   logger.debug('inside oauth create sheet');
   var flag = false;
   var email=req.body.supportive_email;
@@ -106,16 +106,13 @@ router.post("/oauth/createSheets",[check_form_author,refresh_token_provider], (r
   })
 });
 
-router.post('/oauth/createFolder',[credential_provider, refresh_token_provider], (req, res) => {
+router.post('/oauth/createFolder',[credential_provider, integration_provider], (req, res) => {
   logger.debug('inside oauth create folder');
-  const { supportive_email, path, integration_id, oauth_provider } = req.body;
-  const token = req.headers['access-token'];
+  const { path, integration_id } = req.body;
   let message='';
-  let url='';
-  let options={};
   switch (integration_id){
     case globalConstant.GOOGLE_DRIVE:
-      const { refresh_token } =req;
+      const { refresh_token }=req.integration;
       const { google_client_id, google_client_secret, google_redirect_uri } = req.body.credentials;
       logger.debug('hit google OAuth request');
       const oauth2Client = new google.auth.OAuth2(
@@ -133,77 +130,55 @@ router.post('/oauth/createFolder',[credential_provider, refresh_token_provider],
           'name': path,
           'mimeType': 'application/vnd.google-apps.folder'
       };
-      logger.debug('hit drive request for folder creation')
+      logger.debug('hit drive request for folder creation');
       drive.files.create({
-      resource: fileMetadata,
-      fields: 'id'
-      }, function (err, file) {
+        resource: fileMetadata,
+        fields: 'id'
+        }, function (err, file) {
           if (err) {
-              const message = `folder not created :: Error : ${err}`;
-              logger.debug(message);
-              return Promise.reject(message);
+            const message = `folder not created :: Error : ${err}`;
+            logger.debug(message);
+            return Promise.reject(message);
           } else {
-              logger.debug(`folder created :: ${file}`);
-              return res.json({ "data":file });
+            logger.debug(`folder created :: ${file}`);
+            return res.json({ "data":file });
           }
       });
       break;
+
     case globalConstant.DROP_BOX:
       let oauth_token='';
-      url = `${config.AUTH_SERVICE_BASE_URL}/auth/api/refreshoauthAccess`;
-      options = {
-        method: 'PUT',
-        headers: {
-          'access-token': token,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          oauth_provider,
-          integration_id,
-          supportive_email
-        })
+      let drop_box='';
+      if(req["integration"] && req.integration["access_token"]) {
+        logger.debug('new access token fetched');
+        oauth_token = req.integration['access_token'];
       }
-      logger.debug('hit request to refresh access-token')
-      fetch(url,options)
-      .then(resp => resp.json())
-      .then(data => {
-        if(data && data["integration"] && data.integration["access_token"]) {
-          logger.debug('new access token fetched');
-          oauth_token = data.integration['access_token'];
+      if(oauth_token) {
+        logger.debug('hit request on drop_box')
+        drop_box = dropboxV2Api.authenticate({ token: oauth_token });
+      }
+      else {
+        message='access token not fected';
+        logger.debug(message)
+        return Promise.reject(message);
+      }
+      dropbox({
+        resource: 'files/create_folder',
+          parameters: {
+          "path": path,
+          "autorename": false
         }
-        if(oauth_token) {
-          logger.debug('hit request on drop_box')
-          return dropboxV2Api.authenticate({ token: oauth_token });
+      }, (err, result, response) => {
+        if (err) {
+          message = `folder not created :: Error : ${err}`;
+          logger.debug(message);
+          return Promise.reject(message); 
         }
-        else {
-          message='access token not fected';
-          logger.debug(message)
-          return Promise.reject(message);
-        }
-      })
-      .then(dropbox => {
-        dropbox({
-          resource: 'files/create_folder',
-           parameters: {
-            "path": path,
-            "autorename": false
-          }
-        }, (err, result, response) => {
-          if (err) {
-            message = `folder not created :: Error : ${err}`;
-            logger.debug(message);
-            return Promise.reject(message); 
-          }
-          logger.debug('folder created with id :: '+result.metadata.id);
-          return res.json({ 'folder_info': result.metadata});
-        });
-      })
-      .catch(err => {
-        logger.error(errorMessages.INTERNAL_SERVER_ERROR+err);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(apiUtils.getResponse(errorMessages.INTERNAL_SERVER_ERROR+err,HttpStatus.INTERNAL_SERVER_ERROR))
-      })
+        logger.debug('folder created with id :: '+result.metadata.id);
+        return res.json({ 'folder_info': result.metadata});
+      });
       break;
+      
     default:
       message = 'no service for integration';
       logger.debug(message);
