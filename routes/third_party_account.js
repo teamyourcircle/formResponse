@@ -16,6 +16,7 @@ const check_form_author = require('../middleWareFun/check_form_author');
 const errorMessages = require('../util/errorMessages');
 const globalConstant = require('../util/globalConstant');
 const credential_provider = require('../middleWareFun/credential_provider');
+const oauth_folder_helper = require('../util/oauth_folder_helper');
 
 /**
  * create google sheet with form data
@@ -174,28 +175,59 @@ router.post('/oauth/createFolder',credential_provider, (req, res) => {
   logger.debug('inside oauth create folder');
   const { supportive_email, path, integration_id, oauth_provider } = req.body;
   const token = req.headers['access-token'];
-  let oauth_token='';
   let message='';
+  let url='';
+  let options={};
   switch (integration_id){
     case globalConstant.GOOGLE_DRIVE:
-      logger.debug('google drive coming soon');
-      const { google_client_id, google_client_secret, google_redirect_uri } = req.body.credentials;
-      const oauth2Client = new google.auth.OAuth2(
-        google_client_id,
-        google_client_secret,
-        google_redirect_uri
-      );
-      oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-      const drive = google.drive({
-        version: 'v3',
-        auth: oauth2Client,
-      });
-
-      
+      url = `${config.AUTH_SERVICE_BASE_URL}/auth/api/user/oauthApps/byIntegrationId?integration_id=${integration_id}`;
+      const refresh_token='';
+      options = {
+        method: 'GET',
+        headers: {
+          'access-token': token,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      }
+      logger.debug('hit request for refresh token')
+      fetch(url, options)
+      .then(resp => resp.json())
+      .then(data => {
+        if(data && data["integartionList"] && data.integartionList["refresh_token"]) {
+          logger.debug('refresh token fetched');
+          refresh_token = data.integartionList['refresh_token'];
+        }
+        if(refresh_token) {
+          logger.debug('hit request on google_drive')
+          return oauth_folder_helper.createFolder(req.body.credentials, path, refresh_token);
+        }
+        else {
+          message='access token not fected';
+          logger.debug(message)
+          return Promise.reject(message);
+        }
+      })
+      .then(response => {
+        if(response && response["data"]) {
+          logger.debug(`created folder info :: ${response.data}`);
+          return res.json({ "data":response.file });
+        }
+        else {
+          message = `folder not created :: Error : ${response}`;
+          logger.debug(message);
+          return Promise.reject(message); 
+        }
+      })
+      .catch(err => {
+        logger.error(errorMessages.INTERNAL_SERVER_ERROR+err);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(apiUtils.getResponse(errorMessages.INTERNAL_SERVER_ERROR+err,HttpStatus.INTERNAL_SERVER_ERROR))
+      })
       break;
     case globalConstant.DROP_BOX:
-      const url = `${config.AUTH_SERVICE_BASE_URL}/auth/api/refreshoauthAccess`;
-      const options = {
+      let oauth_token='';
+      url = `${config.AUTH_SERVICE_BASE_URL}/auth/api/refreshoauthAccess`;
+      options = {
         method: 'PUT',
         headers: {
           'access-token': token,
@@ -249,7 +281,7 @@ router.post('/oauth/createFolder',credential_provider, (req, res) => {
       })
       break;
     default:
-      message = 'invalid integration found';
+      message = 'no service for integration';
       logger.debug(message);
       return Promise.reject(message)
   }
