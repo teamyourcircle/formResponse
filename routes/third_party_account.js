@@ -1,10 +1,8 @@
 const express = require('express');
 const router=express.Router();
-const { google } = require('googleapis');
 var async = require("async");
 const path = require('path');
 const fs = require('fs');
-const dropboxV2Api = require('dropbox-v2-api');
 const fetch = require('node-fetch');
 const HttpStatus = require('http-status-codes');
 const env = process.env.NODE_ENV || 'development';
@@ -107,83 +105,44 @@ router.post("/oauth/createSheets",[check_form_author,integration_provider], (req
 });
 
 router.post('/oauth/createFolder',[credential_provider, integration_provider], (req, res) => {
+  let responsePromiseFolder;
   logger.debug('inside oauth create folder');
   const { path, integration_id } = req.body;
   let message='';
   switch (integration_id){
     case globalConstant.GOOGLE_DRIVE:
-      const { refresh_token }=req.integration;
-      const { google_client_id, google_client_secret, google_redirect_uri } = req.body.credentials;
-      logger.debug('hit google OAuth request');
-      const oauth2Client = new google.auth.OAuth2(
-          google_client_id,
-          google_client_secret,
-          google_redirect_uri
-      );
-      logger.debug('set OAuth credentials');
-      oauth2Client.setCredentials({ refresh_token });
-      const drive = google.drive({
-          version: 'v3',
-          auth: oauth2Client,
-      });
-      var fileMetadata = {
-          'name': path,
-          'mimeType': 'application/vnd.google-apps.folder'
-      };
-      logger.debug('hit drive request for folder creation');
-      drive.files.create({
-        resource: fileMetadata,
-        fields: 'id'
-        }, function (err, file) {
-          if (err) {
-            const message = `folder not created :: Error : ${err}`;
-            logger.debug(message);
-            return Promise.reject(message);
-          } else {
-            logger.debug(`folder created :: ${file}`);
-            return res.json({ "data":file });
-          }
-      });
+      const refresh_token = req.refresh_token;
+      responsePromiseFolder = apiUtils.getGoogleDriveOAuth(req.body.credentials, refresh_token, path)
       break;
-
     case globalConstant.DROP_BOX:
       let oauth_token='';
-      let drop_box='';
-      if(req["integration"] && req.integration["access_token"]) {
-        logger.debug('new access token fetched');
-        oauth_token = req.integration['access_token'];
-      }
+      logger.debug('new access token fetched');
+      oauth_token = req['access_token'];
       if(oauth_token) {
         logger.debug('hit request on drop_box')
-        drop_box = dropboxV2Api.authenticate({ token: oauth_token });
+        responsePromiseFolder = apiUtils.getDropboxOAuth(oauth_token, path)
       }
       else {
         message='access token not fected';
         logger.debug(message)
         return Promise.reject(message);
       }
-      dropbox({
-        resource: 'files/create_folder',
-          parameters: {
-          "path": path,
-          "autorename": false
-        }
-      }, (err, result, response) => {
-        if (err) {
-          message = `folder not created :: Error : ${err}`;
-          logger.debug(message);
-          return Promise.reject(message); 
-        }
-        logger.debug('folder created with id :: '+result.metadata.id);
-        return res.json({ 'folder_info': result.metadata});
-      });
       break;
-      
     default:
       message = 'no service for integration';
       logger.debug(message);
-      return Promise.reject(message)
+      responsePromiseFolder = Promise.reject(message);
   }
+  responsePromiseFolder
+  .then(response => {
+    res.json(response)
+  })
+  .catch(err => {
+    logger.error('folder cannot be created');
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+      'message': 'new folder cannot be created :: '+err
+    })
+  })
 })
 
 module.exports = router;

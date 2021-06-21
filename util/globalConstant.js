@@ -5,7 +5,7 @@ module.exports = {
     UNDERSCORE_ID: '_id',
     QUEUE_SCHEMA: 'queueName',
     GOOGLE:'google',
-    GOOGLE_DRIVE: 'google_drive',
+    GOOGLE_DRIVE: 'google-drive',
     DROP_BOX: 'drop_box',
     KEY:'api-key',
     INTEGRATION_ID: 'google-sheets',
