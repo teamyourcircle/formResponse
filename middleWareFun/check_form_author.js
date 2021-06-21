@@ -9,16 +9,22 @@ const logger = require('../util/logger');
 const check_form_author = (req, res, next) => {
     logger.debug('determine the form author');
     const token = req.headers[globalConstant.TOKEN];
-    const formId = req.body.formId || req.query.formId;
-    if(token){
+    const key=req.headers[globalConstant.KEY];
+    const formId = req.body.formId || req.query.formId 
+    if(token || key){
         const url = apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL,'/form/api/myforms');
-        const options = {
+        const options={
             method: 'GET',
             headers: {
-                'access-token': token,
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             }
+        }
+        if(token){
+            options.headers['access-token']=token;
+        }
+        else{
+            options.headers['api-key']=key;
         }
         fetch(url, options)
         .then(res => {
@@ -53,10 +59,10 @@ const check_form_author = (req, res, next) => {
         })
 
     }else{
-        logger.error(`unauthorized :: token not found`);
+        logger.error(`unauthorized :: token or key not found`);
         res.status(HttpStatus.UNAUTHORIZED).json(
         apiUtils.getError(
-        'unauthorized',
+        'unauthorized :: token or key not found',
         HttpStatus.UNAUTHORIZED))
     }
 }

@@ -12,9 +12,10 @@ const apiUtils = require('../util/apiUtils');
 
 describe('test for forms related information',function () {
     let token = 'access-token';
+    let key = 'fake-key';
     nock(config.FORM_SERVICE_BASE_URL).get(`/forms/user?token=${token}`)
     .reply(HttpStatus.OK,bodyObj.myFormsListFormService);
-    it('should get myforms list',function (done) {
+    it('should get myforms list using access token',function (done) {
         request(server)
         .get('/form/api/myforms')
         .set('access-token',token)
@@ -28,14 +29,43 @@ describe('test for forms related information',function () {
             done();
         })
     })
+    it('should get myforms using api key',(done)=>{
+        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/user?key=${key}`)
+        .reply(HttpStatus.OK,bodyObj.myFormsListFormService);
+
+        request(server)
+        .get('/form/api/myforms')
+        .set('api-key',key)
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end((err,res)=>{
+            should.not.exist(err);
+            res.body['form'].length.should.be.eql(1);
+            res.body['form'][0].should.have.keys('form_title','form_id','init','end');
+            done();
+        })
+    })
+    it('should handle the case when nothing is get filled by user',(done)=>{
+        request(server)
+        .get('/form/api/myforms')
+        .set('accept','application/json')
+        .expect(HttpStatus.UNAUTHORIZED)
+        .end((err,res)=>{
+            should.not.exist(err);
+            res.body.statusCode.should.be.eql(401);
+            res.body.should.have.keys('message', 'statusCode');
+            done();
+        })
+    })
 })
 
 describe('test for delete forms footprint',function (done) {
     let token = 'access-token';
+    let key='fake-key';
     let body = {
         formId: 20
     }
-    before((done)=>{
+    beforeEach((done)=>{
         logger.debug('create consumers and responses for formId : '+body.formId);
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
         .reply(HttpStatus.OK,bodyObj.myForms);
@@ -68,7 +98,7 @@ describe('test for delete forms footprint',function (done) {
             })
         })
     })
-    it('should delete consumers+responses of deleted form',function (done) {
+    it('should delete consumers+responses of deleted form using access-token',function (done) {
         nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/dashboard')
         .reply(HttpStatus.OK,bodyObj.userInfo);
         nock(config.FORM_SERVICE_BASE_URL).get(`/forms/delete/${body.formId}`)
@@ -77,6 +107,24 @@ describe('test for delete forms footprint',function (done) {
         .delete('/form/api/forms/delete')
         .send(body)
         .set('access-token',token)
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end(function (err,res) {
+            should.not.exist(err);
+            res.body.should.have.keys('msg','statusCode');
+            done();
+        })
+    })
+
+    it('should delete consumers+responses of deleted form using api-key',(done)=>{
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/delete/${body.formId}`)
+        .reply(HttpStatus.OK,bodyObj.formTemplatedeleteRes);
+        request(server)
+        .delete('/form/api/forms/delete')
+        .send(body)
+        .set('api-key',key)
         .set('accept','application/json')
         .expect(HttpStatus.OK)
         .end(function (err,res) {
