@@ -20,7 +20,7 @@ open.then(function(conn) {
   }).catch(console.warn);
 }
 
-const sayHello = (queue_name,payload) => {
+const sayHello = (queue,payload) => {
   logger.debug('inside sayhello function');
   logger.debug(`for queue ${queue} payload is ${JSON.stringify(payload)}`);
 }
