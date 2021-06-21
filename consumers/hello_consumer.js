@@ -12,11 +12,17 @@ open.then(function(conn) {
       return ch.consume(queue, function(msg) {
         if (msg !== null) {
           logger.info(`recieving payload from the queue :: ${queue}`);
-          logger.debug(msg.content.toString());
+          sayHello(queue,msg.content.toString());
           ch.ack(msg);
         }
       });
     });
   }).catch(console.warn);
 }
+
+const sayHello = (queue_name,payload) => {
+  logger.debug('inside sayhello function');
+  logger.debug(`for queue ${queue} payload is ${JSON.stringify(payload)}`);
+}
+
 module.exports = hello_consumer;

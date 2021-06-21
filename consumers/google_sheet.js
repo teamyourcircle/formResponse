@@ -15,7 +15,7 @@ open.then(function(conn) {
     return ch.assertQueue(queue).then(function() {
       return ch.consume(queue, function(msg) {
         if (msg !== null) {
-          logger.debug(`recieving payload from the queue :: ${queue}`);
+          logger.info(`recieving payload from the queue :: ${queue}`);
           prepare_the_auth_sheet(queue, msg.content.toString());
           ch.ack(msg);
         }
