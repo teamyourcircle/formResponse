@@ -412,7 +412,7 @@ definitions:
         type: string
         description: Your supportive_email
       path:
-        example: '/folder_name'
+        example: 'folder_path'
         type: string
         description: Path for folder creation
   googleOauthClient:
