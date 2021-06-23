@@ -59,6 +59,19 @@ describe('test for adding consumers',function () {
             done();
         })
     })
+    it('should get the consumers with empty queueName',function (done) {
+        request(server)
+        .get('/form/api/get/all/consumers?tags=sheet') 
+        .set('access-token','token')
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end(function (err,res) {
+            should.not.exist(err);
+            res.body.consumerList.should.be.an.Array();
+            res.body.consumerList[0].should.have.keys('logo','queue','description','display_name','params','actions');
+            done();
+        })
+    })
     after(done => {
         logger.debug('clean the db');
         apiUtils.deleteConsumer(bodyObj.consumerSchema.formId)

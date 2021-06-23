@@ -325,7 +325,7 @@ paths:
       summary: remove the consumers attached to the form
       parameters:
         - $ref: "#/parameters/access_token"
-        - $ref: "#/parameters/consumer_queue_body"
+        - $ref: "#/parameters/delete_consumer_queue_body"
       responses:
         200:
           description: OK
@@ -399,6 +399,18 @@ parameters:
           type: string
         formId:
           type: string
+        template:
+          type: object  
+  delete_consumer_queue_body: &delete_consumer_queue_body
+    name: body
+    in: body
+    schema:
+      type: object
+      properties:
+        queueName:
+          type: string
+        formId:
+          type: string        
   api_key: &api_key
     name: api-key
     in: header

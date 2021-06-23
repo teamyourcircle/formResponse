@@ -2,6 +2,7 @@ const consumerSchema=require('../models/consumerSchema');
 const express = require('express');
 const router=express.Router();
 const consumers = require('../consumers');
+const consumerList = require('../consumers');
 const fetch = require('node-fetch');
 const HttpStatus = require('http-status-codes');
 const check_form_author = require('../middleWareFun/check_form_author');
@@ -11,7 +12,7 @@ const globalConstant = require('../util/globalConstant');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 
-router.get('/get/consumers',async (req,res)=>{
+router.get('/get/consumers',check_form_author,async (req,res)=>{
     const {formId} = req.query;
     logger.debug(`fetch consumers for formId ${formId}`);
     consumerSchema.findOne({formId})
@@ -19,54 +20,38 @@ router.get('/get/consumers',async (req,res)=>{
         if(consumer){
             logger.debug('consumer found');
             var infos = [];
-            let res_body = {};
-            for(let i=0;i<consumer.queueName.length;i++){
-                let info_for_consumer = await get_info_for_consumer(consumer.queueName[i],req.headers['access-token'],formId);
+            for(let i=0;i<consumer[globalConstant.QUEUE_SCHEMA].length;i++){
+                let template = consumer[globalConstant.QUEUE_SCHEMA][i].template;
+                let info_for_consumer = await get_info_for_consumer(consumer[globalConstant.QUEUE_SCHEMA][i].queueName,req.headers['access-token'],formId);
+                info_for_consumer.template = template;
                 infos.push(info_for_consumer);
-                res_body.infos = infos;
-                res_body.queueName = consumer.queueName;
-                res_body.formId = parseInt(formId);
             }
-            if(res_body.queueName)
-            return res.status(HttpStatus.OK).json(res_body);
-            else
-            return res.status(HttpStatus.OK).json({queueName: [], formId});
+            return res.status(HttpStatus.OK).json({consumerList: infos});
         }
         else{
             logger.error('consumer not found');
-            res.status(HttpStatus.NOT_FOUND).json({"queueName":[], "formId":parseInt(formId)});  
+            res.status(HttpStatus.NOT_FOUND).json(apiUtils.getError('no consumer found for formId: '+formId,HttpStatus.NOT_FOUND)); 
         }  
     })
     .catch(err =>{
+        logger.error(err);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(apiUtils.getError('not able to fetch consumers :: '+err, HttpStatus.INTERNAL_SERVER_ERROR))
     })
 })
 
 router.put('/update/consumers', check_form_author,(req,res)=>{
-    const {queueName,formId } = req.body;
+    const {queueName,formId,template} = req.body;
     logger.debug('update the consumer :: add '+queueName);
-    consumerSchema.findOne({formId})
-    .then(fetchedconsumer =>{
-        if(fetchedconsumer==null){
-            logger.debug('create a queue and push '+queueName);
-            const queue = [queueName];
-            const consumer = new consumerSchema({
-                queueName: queue
-                ,formId
-            });
-            consumer.save().then(consumer => {
-                return res.status(HttpStatus.OK).json(apiUtils.getResponse('updated successfully',HttpStatus.OK));
-            })
-        }else{
-            if(fetchedconsumer[globalConstant.QUEUE_SCHEMA].indexOf(queueName)==-1){
-                logger.debug('push '+queueName);
-                consumerSchema.updateOne({"formId": formId},{$push:{"queueName":queueName}})
-                .then(consumer =>{
-                return res.status(HttpStatus.OK).json(apiUtils.getResponse('updated successfully',HttpStatus.OK));
-            })}else{
-                logger.debug('consumer already added');
-                return Promise.reject('consumer already present');
-        }}
+    getQuery(queueName,template,formId)
+    .then((queryForQueueUpdate) =>{
+        let {query,set} = queryForQueueUpdate;
+        return consumerSchema.updateOne(query,set, {upsert:true}); 
+    })
+    .then(updateConsumer => {
+        return consumerSchema.findOne({formId});
+    })
+    .then(consumer => {
+        res.json(consumer);
     })
     .catch(err =>{
         logger.error(`queue not updated due to ${err}`);
@@ -83,7 +68,7 @@ router.delete('/remove/consumers', check_form_author,(req,res)=>{
             logger.debug('consumer schema not found');
             return res.status(HttpStatus.NOT_FOUND).json({"msg": "not found error"});
         }else{
-            if(fetchedconsumer[globalConstant.QUEUE_SCHEMA].indexOf(queueName)!=-1){
+            if(is_queue_present(fetchedconsumer[globalConstant.QUEUE_SCHEMA],queueName)!=-1){
                 logger.debug('consumer schema found pull queue-name');
                 consumerSchema.updateOne({"formId": formId},{$pull:{"queueName":queueName}})
                 .then(consumer =>{
@@ -105,11 +90,11 @@ router.get('/get/all/consumers',(req,res)=>{
     const {tags} = req.query;
     if(!tags){
         logger.debug('no tags return all');
-        res.json(consumers);
+        res.json({consumerList});
     }else{
         const tagsArr = tags.split(',');
         logger.debug('search with tags '+tagsArr);
-        res.json(get_consumers_by_tag(tagsArr));
+        res.json({consumerList:get_consumers_by_tag(tagsArr)});
     }
 
 })
@@ -121,7 +106,9 @@ module.exports = router;
  * @param {*} queueName 
  */
 const get_info_for_consumer = async (queueName,token,formId) =>{
-    var consumerInfo =  consumers.filter(c => c.queue===queueName);
+    logger.debug('inside get info for consumer');
+    let consumerInfo =  consumers.filter(c => c.queue===queueName);
+    let {tags,actions,display_name,params,logo,description,authRequired} = consumerInfo[0];
     if(consumerInfo.length){
         //consumerInfo[0].emails = getSupportiveEmails(queueName,token);
         let data = await getSupportiveEmails(queueName,token);
@@ -138,9 +125,7 @@ const get_info_for_consumer = async (queueName,token,formId) =>{
                 }
             }
         }
-        consumerInfo[0].emails = emails;
-        consumerInfo[0].active_email = active_email;
-        return consumerInfo[0];
+        return {queueName,emails, active_email,static_info:{tags,actions,display_name,params,logo,description,authRequired}};
     }
     return null;
 }
@@ -165,11 +150,11 @@ const getSupportiveEmails = (consumer,token) => {
  */
 const get_consumers_by_tag = (tagsArray) => {
     let selectedConsumer = [];
-    for(let i=0;i<consumers.length;i++){
-        let {tags} = consumers[i]; 
+    for(let i=0;i<consumerList.length;i++){
+        let {tags} = consumerList[i]; 
         for(let j=0;j<tagsArray.length;j++){
             if(contains(tagsArray[j],tags)){
-                selectedConsumer.push(consumers[i]);
+                selectedConsumer.push(consumerList[i]);
                 break;
             }
         }
@@ -186,4 +171,43 @@ const contains = (tag, tags) => {
         return false;
     }
     return true;
+}
+/**
+ * 
+ * @param {*} array 
+ * @param {*} element 
+ */
+const is_queue_present = (array,element) => {
+    return array.filter(a => a.queueName==element).length ? (1) : (-1);
+}
+
+const getQuery = (queueName,template,formId) =>{
+    let query,set;
+    return new Promise((resolve,reject)=>{
+        consumerSchema.findOne({formId})
+        .then(fetchedconsumer => {
+            if(fetchedconsumer){
+                if(is_queue_present(fetchedconsumer[globalConstant.QUEUE_SCHEMA],queueName)==-1){
+                    set = {$push:{[globalConstant.QUEUE_SCHEMA]:{queueName,template}}}
+                    query = {formId};
+                    resolve({query,set});
+                }else{
+                    logger.debug('already present in a queue');
+                    let key = globalConstant.QUEUE_SCHEMA+".$.template";
+                    let q_key = globalConstant.QUEUE_SCHEMA+".queueName";
+                    query = {formId,[q_key]:queueName};
+                    set = {$set:{ [key] : template }};
+                    resolve({query,set});
+                }
+            }else{
+                logger.debug('adding first element in an array');
+                query = {formId};
+                set = {$push:{[globalConstant.QUEUE_SCHEMA]:{queueName,template}}, formId};
+                resolve({query,set});
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
 }
