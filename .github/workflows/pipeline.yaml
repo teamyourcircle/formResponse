@@ -42,7 +42,16 @@ jobs:
       uses: superchargejs/redis-github-action@1.1.0
       with:
         redis-version: ${{ matrix.redis-version }}
+    # setup node
+    - name: set node.js v${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: https://npm.pkg.github.com/
+        scope:  "@teamyourcircle"    
     - run: npm ci
+      env: 
+        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
     - run: npm i mocha --save-dev
     - run: npm run build --if-present
     - run: npm test    
