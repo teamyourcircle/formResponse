@@ -24,7 +24,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-        registry-url: https://registry.npmjs.org
+        registry-url: https://npm.pkg.github.com/TeamYourCircle
     # set up rabbitmq
     - name: set rabbitmq
       uses: nijel/rabbitmq-action@v1.0.0
