@@ -26,11 +26,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         always-auth: true
         # registry-url: 'https://npm.pkg.github.com'
-        # scope:  "@teamyourcircle"
-    - run: npm ci
-    - run: npm i mocha --save-dev
-    - run: npm run build --if-present
-    - run: npm test    
+        # scope:  "@teamyourcircle"    
     # set up rabbitmq
     - name: set rabbitmq
       uses: nijel/rabbitmq-action@v1.0.0
@@ -46,4 +42,8 @@ jobs:
       uses: superchargejs/redis-github-action@1.1.0
       with:
         redis-version: ${{ matrix.redis-version }}
+    - run: npm ci
+    - run: npm i mocha --save-dev
+    - run: npm run build --if-present
+    - run: npm test    
 
