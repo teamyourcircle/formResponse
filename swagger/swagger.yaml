@@ -290,6 +290,9 @@ paths:
           required: true
           type: string
           description: mention formId
+        - in: query  
+          name: email_view
+          type: boolean
       responses:
         200:
           description: OK

@@ -12,19 +12,23 @@ const globalConstant = require('../util/globalConstant');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 
-router.get('/get/consumers',check_form_author,async (req,res)=>{
-    const {formId} = req.query;
+router.get('/get/consumers',async (req,res)=>{
+    const {formId,email_view} = req.query;
     logger.debug(`fetch consumers for formId ${formId}`);
     consumerSchema.findOne({formId})
     .then(async (consumer)=>{
         if(consumer){
             logger.debug('consumer found');
             var infos = [];
-            for(let i=0;i<consumer[globalConstant.QUEUE_SCHEMA].length;i++){
-                let template = consumer[globalConstant.QUEUE_SCHEMA][i].template;
-                let info_for_consumer = await get_info_for_consumer(consumer[globalConstant.QUEUE_SCHEMA][i].queueName,req.headers['access-token'],formId);
-                info_for_consumer.template = template;
-                infos.push(info_for_consumer);
+            if(email_view==="true"){
+                for(let i=0;i<consumer[globalConstant.QUEUE_SCHEMA].length;i++){
+                    let template = consumer[globalConstant.QUEUE_SCHEMA][i].template;
+                    let info_for_consumer = await get_info_for_consumer(consumer[globalConstant.QUEUE_SCHEMA][i].queueName,req.headers['access-token'],formId);
+                    info_for_consumer.template = template;
+                    infos.push(info_for_consumer);
+                }
+            }else{
+                infos = consumer[globalConstant.QUEUE_SCHEMA];
             }
             return res.status(HttpStatus.OK).json({consumerList: infos});
         }

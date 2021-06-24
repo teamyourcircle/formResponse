@@ -46,10 +46,10 @@ const produce_the_message  = (formId,payload) =>{
     logger.debug('sending payload to consumers');
     return new Promise((resolve,reject)=>{
       try {
-        fetch(apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL,`/form/api/get/consumers?formId=${formId}`)
+        fetch(apiUtils.createUrl(config.FORM_RESPONSE_BASE_URL,`/form/api/get/consumers?formId=${formId}&email_view=false`)
         ).then(res =>res.json()).then(data=>{
-          if(data.formId){
-            data.queueName.map(event=>{
+          if(data.consumerList || data.consumerList.length){
+            data.consumerList.map(event=>{
               producer(event, payload)
             })
             resolve();

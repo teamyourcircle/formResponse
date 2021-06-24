@@ -31,7 +31,7 @@ module.exports = [
     },
     {
         queue: "google-calendar",
-        consumer: require('./hello_consumer'),
+        consumer: require('./google_calendar'),
         params:[
             {
                 label: "title",
@@ -40,15 +40,15 @@ module.exports = [
                 required: true
             },
             {
-                label: "start date-time",
+                label: "start_date_time",
                 type: "datetime-local",
                 description: "event starting date-time",
                 required: true
             },
             {
-                label: "end date-time / Duration",
-                type: "number",
-                description: "event duration in minutes",
+                label: "end_date_time",
+                type: "datetime-local",
+                description: "event end date-time",
                 required: false
             },
             {
