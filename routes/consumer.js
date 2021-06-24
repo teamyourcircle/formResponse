@@ -74,7 +74,7 @@ router.delete('/remove/consumers', check_form_author,(req,res)=>{
         }else{
             if(is_queue_present(fetchedconsumer[globalConstant.QUEUE_SCHEMA],queueName)!=-1){
                 logger.debug('consumer schema found pull queue-name');
-                consumerSchema.updateOne({"formId": formId},{$pull:{"queueName":queueName}})
+                consumerSchema.updateOne({"formId": formId},{$pull:{[globalConstant.QUEUE_SCHEMA]:{[globalConstant.QUEUE_NAME]: queueName}}})
                 .then(consumer =>{
                 res.status(HttpStatus.OK).json({"msg": "removed successfully"});
                 })

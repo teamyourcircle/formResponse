@@ -2,7 +2,14 @@ const mongoose=require('mongoose');
 
 var queueSchema = new mongoose.Schema(
     {
-      queueName: { type: String,required: true},
+      queueName: { 
+        type: String,
+        enum: {
+          values: ['hello','google-sheets','google-calendar'],
+          message: 'input consumer not exists',
+        },
+        required: true
+      },
       template: {type: Object}
     },
     { _id: false }
