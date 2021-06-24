@@ -337,9 +337,31 @@ exports.sheetFunctionalityResource = {
 }
   
 exports.createSheetBody = {
-    client_id:"dummy_client_id",
-    client_secret:"dummy_client_secret",
-    redirect_uri:"http://localhost:3000",
+    oauth_provider:'google',
+    integration_id: 'google-sheets',
     formId: 111,
     supportive_email:'hardik@mail.com',
 }
+
+exports.credentialsBody = {
+    "google_client_id": "dummy client id",
+    "google_client_secret": "dummy clinet secret",
+    "google_redirect_uri": "http://localhost:3000"
+}
+
+exports.dropboxIntegrationList = {
+    "integartionList": [
+        {
+          "_id": "",
+          "social_id": "",
+          "oauth_provider": "drop_box",
+          "access_token": "dropbox access token",
+          "user": "",
+          "email": "hardik@mail.com",
+          "integration_id": "drop_box",
+          "refresh_token": "dropbox refresh token",
+          "__v": 0,
+        }
+    ]
+}
+exports.folderIdResponse = {'folder_id':'0123456789'}

@@ -199,6 +199,43 @@ paths:
           description: Internal Server Error
         default:
           description: Unexpected error
+  /oauth/createFolder:
+    post:
+      summary: create folder for form responses by email, integration_id, oauth_provider and path
+      parameters:
+        - $ref: '#/parameters/access_token'
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/createFolder'
+          required: true
+      description: >-
+         This api allows you to create folder with your access token, form_id and your response
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        401:
+          description: user is not Authorized
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: user not recognized
+        404:
+          description: user not found 
+          schema:
+            type: object
+            properties:
+              Status:
+                type: string
+                example: Not Found Error
+        500:
+          description: Internal Server Error      
+        default:
+          description: Unexpected error 
   /delete/response:
     delete:
       summary: Delete response of a form created by current user
@@ -330,8 +367,19 @@ paths:
         200:
           description: OK
         404:
-          description: Not Found
-definitions:
+          description: Credentials with ClientID, ClientSecret, redirectUrl and Token not found
+          schema:
+            type: object
+            properties:
+              Status:
+                type: string
+                example: Not Found Error
+        500:
+          description: Internal Server Error
+        default:
+          description: Unexpected error 
+
+definitions: 
   submitResponse:
     required:
       - form_id
@@ -347,25 +395,39 @@ definitions:
           items:
             type: object
         description: response here
-
+  createFolder:
+    required:
+      - integration_id
+      - oauth_provider
+      - supportive_email
+      - path
+    properties:
+      integration_id:
+        type: string
+        description: Your integrationId
+      oauth_provider :
+        type: string
+        description: Your oauth_provider
+      supportive_email:
+        type: string
+        description: Your supportive_email
+      path:
+        example: 'folder_path'
+        type: string
+        description: Path for folder creation
   googleOauthClient:
     required:
-      - client_id
-      - client_secret
-      - redirect_uri
+      - oauth_provider
+      - integration_id
       - formId
       - supportive_email
     properties:
-      client_id:
+      oauth_provider:
         type: string
-        description: >
-          google client id
-      client_secret:
+        description: OAuth server provider
+      integration_id:
         type: string
-        description: google client secret
-      redirect_uri:
-        type: string
-        description: google redirect uri
+        description: integration ID you want to use
       formId:
         type: string
       supportive_email:

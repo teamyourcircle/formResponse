@@ -202,3 +202,4 @@ const get_choices = (obj) => {
 module.exports.get_choices = get_choices;
 module.exports.payload_expand = payload_expand;
 module.exports.set_integration_doc = set_integration_doc;
+module.exports.get_credentials = get_credentials;

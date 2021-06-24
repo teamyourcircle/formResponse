@@ -1,5 +1,8 @@
 const express = require('express');
 const router=express.Router();
+var async = require("async");
+const path = require('path');
+const fs = require('fs');
 const fetch = require('node-fetch');
 const HttpStatus = require('http-status-codes');
 const env = process.env.NODE_ENV || 'development';
@@ -8,14 +11,16 @@ const apiUtils = require('../util/apiUtils');
 const oauth_sheet_helper = require('../util/oauth_sheet_helper');
 const logger = require('../util/logger');
 const check_form_author = require('../middleWareFun/check_form_author');
-const refresh_token_provider = require('../middleWareFun/refresh_token_provider');
+const integration_provider = require('../middleWareFun/integration_provider');
 const errorMessages = require('../util/errorMessages');
+const globalConstant = require('../util/globalConstant');
+const credential_provider = require('../middleWareFun/credential_provider');
 
 /**
  * create google sheet with form data
  * @param {*} formId
  */
-router.post("/oauth/createSheets",[check_form_author,refresh_token_provider], (req, res) => {
+router.post("/oauth/createSheets",[check_form_author,credential_provider,integration_provider], (req, res) => {
   logger.debug('inside oauth create sheet');
   var flag = false;
   var email=req.body.supportive_email;
@@ -98,5 +103,46 @@ router.post("/oauth/createSheets",[check_form_author,refresh_token_provider], (r
      })
   })
 });
+
+router.post('/oauth/createFolder',[credential_provider, integration_provider], (req, res) => {
+  let responsePromiseFolder;
+  logger.debug('inside oauth create folder');
+  const { path, integration_id } = req.body;
+  let message='';
+  switch (integration_id){
+    case globalConstant.GOOGLE_DRIVE:
+      const refresh_token = req.refresh_token;
+      responsePromiseFolder = apiUtils.getGoogleDriveOAuth(req.body.credentials, refresh_token, path)
+      break;
+    case globalConstant.DROP_BOX:
+      let oauth_token='';
+      logger.debug('new access token fetched');
+      oauth_token = req['access_token'];
+      if(oauth_token) {
+        logger.debug('hit request on drop_box')
+        responsePromiseFolder = apiUtils.getDropboxOAuth(oauth_token, path)
+      }
+      else {
+        message='access token not fected';
+        logger.debug(message)
+        return Promise.reject(message);
+      }
+      break;
+    default:
+      message = 'no service for integration';
+      logger.debug(message);
+      responsePromiseFolder = Promise.reject(message);
+  }
+  responsePromiseFolder
+  .then(response => {
+    res.json(response)
+  })
+  .catch(err => {
+    logger.error('folder cannot be created');
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+      'message': 'new folder cannot be created :: '+err
+    })
+  })
+})
 
 module.exports = router;
