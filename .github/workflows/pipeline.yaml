@@ -41,6 +41,7 @@ jobs:
       uses: superchargejs/redis-github-action@1.1.0
       with:
         redis-version: ${{ matrix.redis-version }}
+    - run: echo "registry=https://npm.pkg.github.com/@teamyourcircle" >> .npmrc
     - run: npm ci
 
     - run: npm i mocha --save-dev
