@@ -26,6 +26,8 @@ describe('test for third party create sheet', (done) => {
   const queryString = `?integration_id=${globalConstant.INTEGRATION_ID}&supportive_email=${requestBody.supportive_email}`;
   logger.debug('intermediate api requests nocked');
   it('should create new sheet', function(done) {
+    nock(config.AUTH_SERVICE_BASE_URL).get("/auth/api/oauth/credentials")
+    .reply(HttpStatus.OK,bodyObj.credentialsBody);
     nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
     .reply(HttpStatus.OK,bodyObj.myForms);
     nock(config.AUTH_SERVICE_BASE_URL).get(`/auth/api/user/oauthApps/byIntegrationId${queryString}`)
@@ -53,6 +55,8 @@ describe('test for third party create sheet', (done) => {
   });
   it('should already created sheet', function(done) {
     status=HttpStatus.OK;
+    nock(config.AUTH_SERVICE_BASE_URL).get("/auth/api/oauth/credentials")
+    .reply(HttpStatus.OK,bodyObj.credentialsBody);
     nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
     .reply(HttpStatus.OK,bodyObj.myForms);
     nock(config.AUTH_SERVICE_BASE_URL).get(`/auth/api/user/oauthApps/byIntegrationId${queryString}`)
@@ -74,4 +78,109 @@ describe('test for third party create sheet', (done) => {
       done();
     })
   });
+  it('should create new folder for DROPBOX', function(done){
+    const reqBody={
+      oauth_provider:globalConstant.DROP_BOX,
+      integration_id:globalConstant.DROP_BOX,
+      supportive_email:'hardik@mail.com',
+    }
+    nock(config.AUTH_SERVICE_BASE_URL).get("/auth/api/oauth/credentials")
+    .reply(HttpStatus.OK,bodyObj.credentialsBody);
+    nock(config.AUTH_SERVICE_BASE_URL,reqBody).put('/auth/api/refreshoauthAccess')
+    .reply(HttpStatus.OK,bodyObj.dropboxIntegrationList);
+    const stub = sinon.stub(apiUtils, "getDropboxOAuth")
+    stub.resolves(bodyObj.folderIdResponse);
+    request(server)
+    .post('/form/api/oauth/createFolder')
+    .send({ ...reqBody, path:'/test'})
+    .set('access-token',token)
+    .set('accept','application/json')
+    .expect(HttpStatus.OK)
+    .end(function(err, res) {
+      should.not.exist(err);
+      logger.debug('folder created for dropbox');
+      res.body.should.have.keys('folder_id');
+      done();
+    })
+  })
+  it('should create new folder for GOOGLE-DRIVE', function(done){
+    const reqBody={
+      oauth_provider:globalConstant.GOOGLE,
+      integration_id:globalConstant.GOOGLE_DRIVE,
+      supportive_email:'hardik@mail.com',
+    }
+    nock(config.AUTH_SERVICE_BASE_URL).get("/auth/api/oauth/credentials")
+    .reply(HttpStatus.OK,bodyObj.credentialsBody);
+    const queryString = `?integration_id=${globalConstant.GOOGLE_DRIVE}&supportive_email=${reqBody.supportive_email}`;
+    nock(config.AUTH_SERVICE_BASE_URL).get(`/auth/api/user/oauthApps/byIntegrationId${queryString}`)
+    .reply(HttpStatus.OK,bodyObj.dropboxIntegrationList);
+    const stub = sinon.stub(apiUtils, "getGoogleDriveOAuth")
+    stub.resolves(bodyObj.folderIdResponse);
+    request(server)
+    .post('/form/api/oauth/createFolder')
+    .send({ ...reqBody, path:'/test'})
+    .set('access-token',token)
+    .set('accept','application/json')
+    .expect(HttpStatus.OK)
+    .end(function(err, res) {
+      should.not.exist(err);
+      logger.debug('folder created for google drive');
+      res.body.should.have.keys('folder_id');
+      done();
+    })
+  })
+  it('should not create new folder for GOOGLE-DRIVE with wrong integration_id/oauth_provider', function(done){
+    const reqBody={
+      oauth_provider:globalConstant.GOOGLE_DRIVE,
+      integration_id:globalConstant.DROP_BOX,
+      supportive_email:'hardik@mail.com',
+    }
+    nock(config.AUTH_SERVICE_BASE_URL).get("/auth/api/oauth/credentials")
+    .reply(HttpStatus.OK,bodyObj.credentialsBody);
+    const queryString = `?integration_id=${globalConstant.GOOGLE_DRIVE}&supportive_email=${reqBody.supportive_email}`;
+    nock(config.AUTH_SERVICE_BASE_URL).get(`/auth/api/user/oauthApps/byIntegrationId${queryString}`)
+    .reply(HttpStatus.OK,bodyObj.dropboxIntegrationList);
+    const stub = sinon.stub(apiUtils, "getGoogleDriveOAuth")
+    stub.resolves(bodyObj.folderIdResponse);
+    request(server)
+    .post('/form/api/oauth/createFolder')
+    .send({ ...reqBody, path:'/test'})
+    .set('access-token',token)
+    .set('accept','application/json')
+    .expect(HttpStatus.OK)
+    .end(function(err, res) {
+      should.exist(err);
+      res.body.should.have.keys('statusCode','message');
+      res.body.should.have.value('statusCode',HttpStatus.INTERNAL_SERVER_ERROR);
+      res.body.should.have.value('message','internal server errorno oauth provider matched');
+      done();
+    })
+  })
+  it('should not create new folder for DROPBOX with wrong integration_id/oauth_provider', function(done){
+    const reqBody={
+      oauth_provider:globalConstant.GOOGLE_DRIVE,
+      integration_id:globalConstant.DROP_BOX,
+      supportive_email:'hardik@mail.com',
+    }
+    nock(config.AUTH_SERVICE_BASE_URL).get("/auth/api/oauth/credentials")
+    .reply(HttpStatus.OK,bodyObj.credentialsBody);
+    const queryString = `?integration_id=${globalConstant.GOOGLE_DRIVE}&supportive_email=${reqBody.supportive_email}`;
+    nock(config.AUTH_SERVICE_BASE_URL).get(`/auth/api/user/oauthApps/byIntegrationId${queryString}`)
+    .reply(HttpStatus.OK,bodyObj.dropboxIntegrationList);
+    const stub = sinon.stub(apiUtils, "getGoogleDriveOAuth")
+    stub.resolves(bodyObj.folderIdResponse);
+    request(server)
+    .post('/form/api/oauth/createFolder')
+    .send({ ...reqBody, path:'/test'})
+    .set('access-token',token)
+    .set('accept','application/json')
+    .expect(HttpStatus.OK)
+    .end(function(err, res) {
+      should.exist(err);
+      res.body.should.have.keys('statusCode','message');
+      res.body.should.have.value('statusCode',HttpStatus.INTERNAL_SERVER_ERROR);
+      res.body.should.have.value('message','internal server errorno oauth provider matched');
+      done();
+    })
+  })
 })

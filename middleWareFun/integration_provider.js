@@ -50,7 +50,7 @@ function checkOAuthIntegrator(requestBody, token){
     logger.debug('inside check oauth integration')
     if(oauth_provider === globalConstant.GOOGLE) {
         logger.debug('hit request for google');
-        const queryString = `?integration_id=${globalConstant.GOOGLE_DRIVE}&supportive_email=${supportive_email}`;
+        const queryString = `?integration_id=${integration_id}&supportive_email=${supportive_email}`;
         url = apiUtils.createUrl(config.AUTH_SERVICE_BASE_URL,`/auth/api/user/oauthApps/byIntegrationId${queryString}`);
         options = {
             method: 'GET',

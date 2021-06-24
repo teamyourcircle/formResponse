@@ -417,22 +417,17 @@ definitions:
         description: Path for folder creation
   googleOauthClient:
     required:
-      - client_id
-      - client_secret
-      - redirect_uri
+      - oauth_provider
+      - integration_id
       - formId
       - supportive_email
     properties:
-      client_id:
+      oauth_provider:
         type: string
-        description: >
-          google client id
-      client_secret:
+        description: OAuth server provider
+      integration_id:
         type: string
-        description: google client secret
-      redirect_uri:
-        type: string
-        description: google redirect uri
+        description: integration ID you want to use
       formId:
         type: string
       supportive_email:

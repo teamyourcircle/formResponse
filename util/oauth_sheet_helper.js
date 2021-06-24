@@ -44,7 +44,8 @@ function sheetCreator(request, formData, req){
     logger.debug('inside sheetCreator');
     var response_from_google;
     const { refresh_token } = req;
-    const { client_id, client_secret, redirect_uri, supportive_email} = request;
+    const { supportive_email } = request
+    const { client_id, client_secret, redirect_uri } = request.credentials;
     authorize(createSheet);
     function authorize(callback) {
       const oAuth2Client = new google.auth.OAuth2(
