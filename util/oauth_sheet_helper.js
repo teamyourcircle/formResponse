@@ -45,13 +45,13 @@ function sheetCreator(request, formData, req){
     var response_from_google;
     const { refresh_token } = req;
     const { supportive_email } = request
-    const { client_id, client_secret, redirect_uri } = request.credentials;
+    const {google_client_id,google_client_secret,google_redirect_uri}=request.credentials;    
     authorize(createSheet);
     function authorize(callback) {
       const oAuth2Client = new google.auth.OAuth2(
-        client_id,
-        client_secret,
-        redirect_uri
+        google_client_id,
+        google_client_secret,
+        google_redirect_uri
       );
       oAuth2Client.setCredentials({ "refresh_token": refresh_token});
       logger.debug('authorized with google')
@@ -72,10 +72,12 @@ function sheetCreator(request, formData, req){
         ]
       };
       logger.debug('creating spreadsheet');
+      console.log(sheets);
       sheets.spreadsheets.create({
         resource,
       }, (err, spreadsheet) =>{
         if (err) {
+          logger.info(JSON.stringify(err))
           let message = 'internal server error'+err;
           logger.error(message);
           reject({'status':HttpStatus.INTERNAL_SERVER_ERROR, message});

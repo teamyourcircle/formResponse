@@ -152,7 +152,7 @@ describe('test for third party create sheet', (done) => {
       should.exist(err);
       res.body.should.have.keys('statusCode','message');
       res.body.should.have.value('statusCode',HttpStatus.INTERNAL_SERVER_ERROR);
-      res.body.should.have.value('message','internal server errorno oauth provider matched');
+      res.body.should.have.value('message','internal server error :: no oauth provider matched');
       done();
     })
   })
@@ -179,7 +179,7 @@ describe('test for third party create sheet', (done) => {
       should.exist(err);
       res.body.should.have.keys('statusCode','message');
       res.body.should.have.value('statusCode',HttpStatus.INTERNAL_SERVER_ERROR);
-      res.body.should.have.value('message','internal server errorno oauth provider matched');
+      res.body.should.have.value('message','internal server error :: no oauth provider matched');
       done();
     })
   })

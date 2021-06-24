@@ -16,14 +16,14 @@ const integration_provider = (req, res, next) => {
         logger.debug('integartionList fetched');
         if(data){
             logger.debug('search refresh token');
-            if(data["integartionList"].length){
+            if( data.integartionList && data["integartionList"].length){
                 req.refresh_token = data["integartionList"][0]['refresh_token'];
                 req.access_token = data["integartionList"][0]['access_token'];
                 req.oauthBody=data["integartionList"][0];
             }
             else{
-                logger.debug(' refresh token not found');
-                return Promise.reject('refresh token not found');
+                logger.debug('integartionId/refersh_token not found');
+                return Promise.reject('integartionId/refersh_token not found');
             }
         } else {
             logger.debug(data);
@@ -38,7 +38,7 @@ const integration_provider = (req, res, next) => {
         logger.error('internal server error :: '+err);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(
         apiUtils.getError(
-        'internal server error'+err,
+        'internal server error :: '+err,
         HttpStatus.INTERNAL_SERVER_ERROR))
     })
 }
