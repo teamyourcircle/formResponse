@@ -11,7 +11,8 @@ const apiUtils = require('../util/apiUtils');
 const globalConstant = require('../util/globalConstant');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
-
+const {helper_module}=require('@teamyourcircle/form-validator')
+const {verifyTemplate} = helper_module;
 router.get('/get/consumers',async (req,res)=>{
     const {formId,email_view} = req.query;
     logger.debug(`fetch consumers for formId ${formId}`);
@@ -46,7 +47,10 @@ router.get('/get/consumers',async (req,res)=>{
 router.put('/update/consumers', check_form_author,(req,res)=>{
     const {queueName,formId,template} = req.body;
     logger.debug('update the consumer :: add '+queueName);
-    getQuery(queueName,template,formId)
+    validateConsumerBody(queueName,template)
+    .then(()=>{
+        return getQuery(queueName,template,formId);
+    })
     .then((queryForQueueUpdate) =>{
         let {query,set} = queryForQueueUpdate;
         return consumerSchema.updateOne(query,set, {upsert:true}); 
@@ -59,7 +63,7 @@ router.put('/update/consumers', check_form_author,(req,res)=>{
     })
     .catch(err =>{
         logger.error(`queue not updated due to ${err}`);
-        res.status(HttpStatus.NOT_FOUND).json(apiUtils.getError('queue not updated :: '+err, HttpStatus.NOT_FOUND));
+        res.status(HttpStatus.BAD_REQUEST).json(apiUtils.getError('queue not updated :: '+err, HttpStatus.BAD_REQUEST));
     })
 })
 
@@ -184,7 +188,30 @@ const contains = (tag, tags) => {
 const is_queue_present = (array,element) => {
     return array.filter(a => a.queueName==element).length ? (1) : (-1);
 }
+/**
+ * validate the consumer body
+ * @param {*} queueName 
+ * @param {*} template 
+ */
+const validateConsumerBody = (queueName,template) =>{
+    let consumer_details = consumers.filter(c => c.queue===queueName);
+    if(consumer_details.length){
+        let {params} = consumer_details[0];
+        if(!template){
+            template = {};
+        }
+        return verifyTemplate(params,template);
+    }else{
+        return Promise.reject(`consumer with queue_name ${queueName} not exists`);
+    }
+}
 
+/**
+ * return query and set property
+ * @param {*} queueName 
+ * @param {*} template 
+ * @param {*} formId 
+ */
 const getQuery = (queueName,template,formId) =>{
     let query,set;
     return new Promise((resolve,reject)=>{

@@ -14,8 +14,6 @@ describe('test for adding consumers',function () {
     it('should update/add the consumer',function (done) {
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
         .reply(HttpStatus.OK,bodyObj.myForms);
-        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.consumerSchema.formId}`)
-        .reply(HttpStatus.OK,bodyObj.consumerResponse);
         request(server)
         .put('/form/api/update/consumers')
         .send(bodyObj.consumerSchema)
@@ -27,10 +25,97 @@ describe('test for adding consumers',function () {
             done();
         })
     })
+    it('should get the consumers after adding 1 consumer',function (done) {
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        request(server)
+        .get('/form/api/get/consumers?formId='+bodyObj.consumerSchema.formId) 
+        .set('access-token','token')
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end(function (err,res) {
+            should.not.exist(err);
+            res.body.should.have.keys('consumerList');
+            res.body.consumerList.should.be.an.Array();
+            res.body.consumerList.length.should.be.eql(1);
+            done();
+        })
+    })
+    it('should update/add the consumer google-calendar as template is provided',function (done) {
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        request(server)
+        .put('/form/api/update/consumers')
+        .send(bodyObj.googleCalendarConsumer)
+        .set('access-token','token')
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end(function (err,res) {
+            should.not.exist(err);
+            done();
+        })
+    })
+    it('should get the consumers after adding google-calendar',function (done) {
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        request(server)
+        .get('/form/api/get/consumers?formId='+bodyObj.consumerSchema.formId) 
+        .set('access-token','token')
+        .set('accept','application/json')
+        .expect(HttpStatus.OK)
+        .end(function (err,res) {
+            should.not.exist(err);
+            res.body.should.have.keys('consumerList');
+            res.body.consumerList.should.be.an.Array();
+            res.body.consumerList.length.should.be.eql(2);
+            done();
+        })
+    })
+    it('should not update/add the consumer google-calendar as template not provided',function (done) {
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        request(server)
+        .put('/form/api/update/consumers')
+        .send(bodyObj.consumerSchemaCalendar)
+        .set('access-token','token')
+        .set('accept','application/json')
+        .expect(HttpStatus.BAD_REQUEST)
+        .end(function (err,res) {
+            should.not.exist(err);
+            done();
+        })
+    })
+    it('should not update/add the consumer google-calendar as start_date_time not provided',function (done) {
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        request(server)
+        .put('/form/api/update/consumers')
+        .send(bodyObj.googleCalNotDateTime)
+        .set('access-token','token')
+        .set('accept','application/json')
+        .expect(HttpStatus.BAD_REQUEST)
+        .end(function (err,res) {
+            should.not.exist(err);
+            done();
+        })
+    })
+    it('should not update/add the consumer when that consumer not exists',function (done) {
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
+        request(server)
+        .put('/form/api/update/consumers')
+        .send(bodyObj.fakeConsumer)
+        .set('access-token','token')
+        .set('accept','application/json')
+        .expect(HttpStatus.BAD_REQUEST)
+        .end(function (err,res) {
+            should.not.exist(err);
+            done();
+        })
+    })
     it('should remove the consumer added above',function (done) {
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
         .reply(HttpStatus.OK,bodyObj.myForms);
-        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.consumerSchema.formId}`)
         request(server)
         .delete('/form/api/remove/consumers') 
         .send(bodyObj.consumerSchema)
@@ -42,24 +127,7 @@ describe('test for adding consumers',function () {
             done();
         })
     })
-    it('should get the consumers with empty queueName',function (done) {
-        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
-        .reply(HttpStatus.OK,bodyObj.myForms);
-        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.consumerSchema.formId}`)
-        request(server)
-        .get('/form/api/get/consumers?formId='+bodyObj.consumerSchema.formId) 
-        .set('access-token','token')
-        .set('accept','application/json')
-        .expect(HttpStatus.OK)
-        .end(function (err,res) {
-            should.not.exist(err);
-            res.body.should.have.keys('consumerList');
-            res.body.consumerList.should.be.an.Array();
-            res.body.consumerList.length.should.be.eql(0);
-            done();
-        })
-    })
-    it('should get the consumers with empty queueName',function (done) {
+    it('should get the consumers all the consumers with static info',function (done) {
         request(server)
         .get('/form/api/get/all/consumers?tags=sheet') 
         .set('access-token','token')

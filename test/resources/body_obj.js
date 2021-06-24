@@ -136,6 +136,30 @@ exports.consumerSchema = {
     formId: '118',
     queueName: 'hello'
 }
+exports.googleCalendarConsumer={
+    "queueName": "google-calendar",
+    "formId": "118",
+    "template":{
+    "title":"nitesh",
+    "start_date_time": "13/03/2022",
+    "end_date_time": "13/03/2022"
+    }
+  }
+  exports.googleCalNotDateTime={
+    "queueName": "google-calendar",
+    "formId": "118",
+    "template":{
+    "title":"nitesh"
+    }
+  }
+exports.consumerSchemaCalendar = {
+    formId: '118',
+    queueName: 'google-calendar'
+}
+exports.fakeConsumer = {
+    formId: '118',
+    queueName: 'fake'
+}
 exports.newconsumerSchema = {
     formId: '20',
     queueName: 'hello'
