@@ -16,7 +16,7 @@ describe('test the submission of response', function () {
     .reply(HttpStatus.OK,bodyObj.userInfo);
     nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.formResponse.form_id}`)
     .reply(HttpStatus.OK,bodyObj.newformTemplate);
-    nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.formResponse.form_id}?email_view=false`)
+    nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.formResponse.form_id}&email_view=false`)
     .reply(HttpStatus.OK,bodyObj.consumerResponse_1);
     it('should successfully submit the response', function(done){
         request(server)

@@ -69,7 +69,7 @@ describe('test for delete forms footprint',function (done) {
         logger.debug('create consumers and responses for formId : '+body.formId);
         nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/dashboard')
         .reply(HttpStatus.OK,bodyObj.userInfo);
-        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${body.formId}?email_view=false`)
+        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${body.formId}&email_view=false`)
         .reply(HttpStatus.OK,bodyObj.newconsumerResponse);
         nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${body.formId}`)
         .reply(HttpStatus.OK,bodyObj.newformTemplate);
