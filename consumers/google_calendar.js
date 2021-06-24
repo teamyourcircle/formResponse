@@ -4,6 +4,8 @@ const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 var open = require('amqplib').connect(config.RABBIT_MQ_URL);
 const {get_credentials,authorize} = require('./google_sheet');
+const {helper_module}=require('@teamyourcircle/form-validator')
+const encode = helper_module.convertStringToVariable;
 const google_calendar = async (queue, isNoAck = false, durable = false, prefetch = null) => {
 // Consumer
 open.then(function(conn) {

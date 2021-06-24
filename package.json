@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/hardikshah197/formResponse#readme",
   "dependencies": {
+    "@teamyourcircle/form-validator": "^1.4.1",
     "amqplib": "^0.7.1",
     "chai": "^4.3.4",
     "chai-arrays": "^2.2.0",
