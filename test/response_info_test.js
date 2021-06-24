@@ -14,7 +14,7 @@ describe('test the response flow get|delete',function () {
     let key='fake key';
     let responseID;
     before((done)=>{
-        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.consumerResponse_1.formId}`)
+        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.formResponse_1.form_id}?email_view=false`)
         .reply(HttpStatus.OK,bodyObj.consumerResponse_1);
         nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.formResponse_1.form_id}`)
         .reply(HttpStatus.OK,bodyObj.newformTemplate);

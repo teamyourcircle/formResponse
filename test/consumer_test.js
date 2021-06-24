@@ -53,9 +53,9 @@ describe('test for adding consumers',function () {
         .expect(HttpStatus.OK)
         .end(function (err,res) {
             should.not.exist(err);
-            res.body.should.have.keys('formId','queueName');
-            res.body[globalConstant.QUEUE_SCHEMA].should.be.an.Array();
-            res.body[globalConstant.QUEUE_SCHEMA].length.should.be.eql(0);
+            res.body.should.have.keys('consumerList');
+            res.body.consumerList.should.be.an.Array();
+            res.body.consumerList.length.should.be.eql(0);
             done();
         })
     })

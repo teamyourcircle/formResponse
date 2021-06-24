@@ -181,21 +181,21 @@ exports.myFormsListFormService = {
 }
 
 exports.newconsumerResponse = {
-    queueName: [
-        "hello"
-    ],
-    "formId": 20
+    "consumerList": [
+        {
+          "queueName": "hello"
+        }
+    ]
 }
 exports.consumerResponse_1 = {
-    queueName: [
-    ],
-    "formId": 420
+    "consumerList": []
 }
 exports.consumerResponse = {
-    queueName: [
-        "hello"
-    ],
-    "formId": 118
+    "consumerList": [
+        {
+          "queueName": "hello"
+        }
+    ]
 }
 exports.consumerPayloadSheet = `{"formId":"118","responseBy":"60b91f6dee3e746a0b550e96","sections":[[{"is_choice":false,"name":"ritu"},
 {"is_choice":true,"gender":{"male":0,"female":1}}]]}` 
