@@ -8,4 +8,4 @@ logs
 /.env
 
 #nmprc file
-.nmprc
+.npmrc
