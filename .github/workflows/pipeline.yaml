@@ -25,7 +25,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: https://npm.pkg.github.com
-        scope:  @teamyourcircle
+        scope:  "@teamyourcircle"
     # set up rabbitmq
     - name: set rabbitmq
       uses: nijel/rabbitmq-action@v1.0.0
