@@ -41,13 +41,13 @@ module.exports = [
             },
             {
                 label: "start_date_time",
-                type: "datetime-local",
+                type: "datetime",
                 description: "event starting date-time",
                 required: true
             },
             {
                 label: "end_date_time",
-                type: "datetime-local",
+                type: "datetime",
                 description: "event end date-time",
                 required: false
             },
