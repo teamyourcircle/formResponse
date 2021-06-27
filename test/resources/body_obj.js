@@ -284,6 +284,26 @@ exports.createSheetResponse = {
     supportive_email: "niteshdipg@mail.com",
     status: 200,
 }
+exports.consumerResources = {
+    title: "{{title_here}} and {{description_here}}",
+    description: "meet for: {{description_here}}"
+}
+exports.newpayloadForTemplateExchange = {
+    "formId": "118",
+    "responseBy": "60b91f6dee3e746a0b550e96",
+    "sections": [
+      [
+        {
+          "is_choice": false,
+          "title - here": "consultancy"
+        },
+        {
+          "is_choice": false,
+          "description - here": "cosult for pain in back"
+        }
+      ]
+    ]
+};
 exports.formResponseArray = [
     {
     "_id": "606af26e0b77321ae8eac21a",

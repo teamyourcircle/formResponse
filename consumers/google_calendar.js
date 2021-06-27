@@ -137,3 +137,6 @@ const getConsumerResourcesForThirdParty = (paramValues,consumerResources) => {
   }
   return updatedResourcses;
 }
+
+module.exports.makeConsumerResource = makeConsumerResource;
+module.exports.getConsumerResourcesForThirdParty = getConsumerResourcesForThirdParty;;
