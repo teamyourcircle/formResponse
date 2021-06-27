@@ -26,7 +26,7 @@ const compareRespAndTemplate = (req,res,next)=>{
             return response.json();
         else
         {logger.debug('failed to fetch');
-            return new Promise((resolve,reject)=>{reject(`unauthorized form ${req.body.form_id} :: not created by user`)})}
+            return new Promise((resolve,reject)=>{reject(`unauthorized form ${req.body.form_id} :: form template not fetched`)})}
     })
     .then((template)=>{
         logger.debug('template fetched successfully')

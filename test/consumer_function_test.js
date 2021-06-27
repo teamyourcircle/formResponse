@@ -1,4 +1,5 @@
 const google_sheet_consumer = require('../consumers/google_sheet');
+const google_caledar_consumer = require('../consumers/google_calendar');
 const resource = require('./resources/body_obj')
 const chai = require('chai');
 const HttpStatus = require('http-status-codes');
@@ -40,6 +41,24 @@ describe('test for add row to sheet functions',function(){
         .catch(err => {
             done(err);
         })
+    })
+
+})
+
+describe('test the payload creator with template',function () {
+    let encodedPayload;
+    it('test the function: makeConsumerResource',function(done){
+        encodedPayload = google_caledar_consumer.makeConsumerResource(resource.newpayloadForTemplateExchange);
+        encodedPayload.should.have.keys('title_here','description_here');
+        encodedPayload.should.have.value('title_here','consultancy')
+        done();
+    })
+    it('test the function: getConsumerResourcesForThirdParty',function(done){
+        let valForThirdParty = google_caledar_consumer.getConsumerResourcesForThirdParty(encodedPayload,resource.consumerResources);
+        valForThirdParty.should.have.keys('title');
+        valForThirdParty.should.have.value('title','consultancy and cosult for pain in back');
+        valForThirdParty.should.have.value('description','meet for: cosult for pain in back');
+        done();
     })
 
 })

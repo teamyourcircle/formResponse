@@ -65,13 +65,11 @@ describe('test for delete forms footprint',function (done) {
     let body = {
         formId: 20
     }
-    beforeEach((done)=>{
+    before((done)=>{
         logger.debug('create consumers and responses for formId : '+body.formId);
-        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
-        .reply(HttpStatus.OK,bodyObj.myForms);
         nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/dashboard')
         .reply(HttpStatus.OK,bodyObj.userInfo);
-        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${body.formId}`)
+        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${body.formId}&email_view=false`)
         .reply(HttpStatus.OK,bodyObj.newconsumerResponse);
         nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${body.formId}`)
         .reply(HttpStatus.OK,bodyObj.newformTemplate);
@@ -101,6 +99,8 @@ describe('test for delete forms footprint',function (done) {
     it('should delete consumers+responses of deleted form using access-token',function (done) {
         nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/dashboard')
         .reply(HttpStatus.OK,bodyObj.userInfo);
+        nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
+        .reply(HttpStatus.OK,bodyObj.myForms);
         nock(config.FORM_SERVICE_BASE_URL).get(`/forms/delete/${body.formId}`)
         .reply(HttpStatus.OK,bodyObj.formTemplatedeleteRes);
         request(server)

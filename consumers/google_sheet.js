@@ -25,17 +25,12 @@ open.then(function(conn) {
 }
 module.exports = google_sheet;
 
-/*
-* global variable for sheet info
-*/
-let document_info = {};
-
 /**
  * this function will add the data
  * @param {*} auth 
  * @param {*} payload 
  */
-const add_row_to_sheet = (auth,payload) =>{
+const add_row_to_sheet = (auth,payload,document_info) =>{
     logger.debug('add row to google sheet');
     const formId = JSON.parse(payload)['formId'];
     const spreadsheetId = document_info['additional_info'][formId]['spreadsheet_id'];
@@ -126,9 +121,9 @@ const authorize = (callback, formId, integration_id,payload,credentials) => {
     google_redirect_uri
     );
     set_integration_doc(formId,integration_id)
-    .then(() => {
-        oAuth2Client.setCredentials({ "refresh_token": document_info['refresh_token']});
-        callback(oAuth2Client,payload);
+    .then((data) => {
+        oAuth2Client.setCredentials({ "refresh_token": data['refresh_token']});
+        callback(oAuth2Client,payload,data);
     })
     .catch(err =>{
         logger.error('not able to authorize from google :: '+err);
@@ -155,7 +150,6 @@ const set_integration_doc = (formId,integrationId)=>{
         .then(data =>{
             if(!data.error){
                 logger.debug('documet info fetched');
-                document_info = data;
                 resolve(data);
             }
             else{
@@ -203,3 +197,4 @@ module.exports.get_choices = get_choices;
 module.exports.payload_expand = payload_expand;
 module.exports.set_integration_doc = set_integration_doc;
 module.exports.get_credentials = get_credentials;
+module.exports.authorize = authorize;

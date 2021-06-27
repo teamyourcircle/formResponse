@@ -14,7 +14,7 @@ describe('test the response flow get|delete',function () {
     let key='fake key';
     let responseID;
     before((done)=>{
-        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.consumerResponse_1.formId}`)
+        nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/consumers?formId=${bodyObj.formResponse_1.form_id}&email_view=false`)
         .reply(HttpStatus.OK,bodyObj.consumerResponse_1);
         nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.formResponse_1.form_id}`)
         .reply(HttpStatus.OK,bodyObj.newformTemplate);
@@ -38,7 +38,7 @@ describe('test the response flow get|delete',function () {
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
         .reply(HttpStatus.OK,bodyObj.myForms);
         request(server)
-        .get(`/form/api/get/response/${responseID}?formId=${bodyObj.consumerResponse_1.formId}`)
+        .get(`/form/api/get/response/${responseID}?formId=${bodyObj.formResponse_1.form_id}`)
         .set('access-token',token)
         .set('accept','application/json')
         .expect(HttpStatus.OK)
@@ -53,7 +53,7 @@ describe('test the response flow get|delete',function () {
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
         .reply(HttpStatus.OK,bodyObj.myForms);
         request(server)
-        .get(`/form/api/get/response/${responseID}?formId=${bodyObj.consumerResponse_1.formId}`)
+        .get(`/form/api/get/response/${responseID}?formId=${bodyObj.formResponse_1.form_id}`)
         .set('api-key','api')
         .set('accept','application/json')
         .expect(HttpStatus.OK)
@@ -67,10 +67,10 @@ describe('test the response flow get|delete',function () {
     it('should get the responses by formId (using access token) added above',function (done) {
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
         .reply(HttpStatus.OK,bodyObj.myForms);
-        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.consumerResponse_1.formId}`)
+        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.formResponse_1.form_id}`)
         .reply(HttpStatus.OK,bodyObj.formTemplate);
         request(server)
-        .get(`/form/api/get/responses?formId=${bodyObj.consumerResponse_1.formId}`)
+        .get(`/form/api/get/responses?formId=${bodyObj.formResponse_1.form_id}`)
         .set('access-token',token)
         .set('accept','application/json')
         .expect(HttpStatus.OK)
@@ -85,10 +85,10 @@ describe('test the response flow get|delete',function () {
     it('should get the responses by formId (using api key)',(done)=>{
         nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
         .reply(HttpStatus.OK,bodyObj.myForms);
-        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.consumerResponse_1.formId}`)
+        nock(config.FORM_SERVICE_BASE_URL).get(`/forms/form_info/${bodyObj.formResponse_1.form_id}`)
         .reply(HttpStatus.OK,bodyObj.formTemplate);
         request(server)
-        .get(`/form/api/get/responses?formId=${bodyObj.consumerResponse_1.formId}`)
+        .get(`/form/api/get/responses?formId=${bodyObj.formResponse_1.form_id}`)
         .set('api-key',key)
         .set('accept','application/json')
         .expect(HttpStatus.OK)
@@ -108,7 +108,7 @@ describe('test the response flow get|delete',function () {
         .delete(`/form/api/delete/response`)
         .send({
             response_id: responseID,
-            formId: bodyObj.consumerResponse_1.formId
+            formId: bodyObj.formResponse_1.form_id
         })
         .set('access-token',token)
         .set('accept','application/json')
@@ -127,7 +127,7 @@ describe('test the response flow get|delete',function () {
         .delete(`/form/api/delete/response`)
         .send({
             response_id: responseID,
-            formId: bodyObj.consumerResponse_1.formId
+            formId: bodyObj.formResponse_1.form_id
         })
         .set('api-key','api')
         .set('accept','application/json')

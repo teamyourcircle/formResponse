@@ -6,6 +6,4 @@ logs
 
 #env files
 /.env
-
-#nmprc file
 .npmrc

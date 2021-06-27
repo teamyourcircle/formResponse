@@ -136,6 +136,30 @@ exports.consumerSchema = {
     formId: '118',
     queueName: 'hello'
 }
+exports.googleCalendarConsumer={
+    "queueName": "google-calendar",
+    "formId": "118",
+    "template":{
+    "title":"nitesh",
+    "start_date_time": "13/03/2022",
+    "end_date_time": "13/03/2022"
+    }
+  }
+  exports.googleCalNotDateTime={
+    "queueName": "google-calendar",
+    "formId": "118",
+    "template":{
+    "title":"nitesh"
+    }
+  }
+exports.consumerSchemaCalendar = {
+    formId: '118',
+    queueName: 'google-calendar'
+}
+exports.fakeConsumer = {
+    formId: '118',
+    queueName: 'fake'
+}
 exports.newconsumerSchema = {
     formId: '20',
     queueName: 'hello'
@@ -181,21 +205,21 @@ exports.myFormsListFormService = {
 }
 
 exports.newconsumerResponse = {
-    queueName: [
-        "hello"
-    ],
-    "formId": 20
+    "consumerList": [
+        {
+          "queueName": "hello"
+        }
+    ]
 }
 exports.consumerResponse_1 = {
-    queueName: [
-    ],
-    "formId": 420
+    "consumerList": []
 }
 exports.consumerResponse = {
-    queueName: [
-        "hello"
-    ],
-    "formId": 118
+    "consumerList": [
+        {
+          "queueName": "hello"
+        }
+    ]
 }
 exports.consumerPayloadSheet = `{"formId":"118","responseBy":"60b91f6dee3e746a0b550e96","sections":[[{"is_choice":false,"name":"ritu"},
 {"is_choice":true,"gender":{"male":0,"female":1}}]]}` 
@@ -260,6 +284,26 @@ exports.createSheetResponse = {
     supportive_email: "niteshdipg@mail.com",
     status: 200,
 }
+exports.consumerResources = {
+    title: "{{title_here}} and {{description_here}}",
+    description: "meet for: {{description_here}}"
+}
+exports.newpayloadForTemplateExchange = {
+    "formId": "118",
+    "responseBy": "60b91f6dee3e746a0b550e96",
+    "sections": [
+      [
+        {
+          "is_choice": false,
+          "title - here": "consultancy"
+        },
+        {
+          "is_choice": false,
+          "description - here": "cosult for pain in back"
+        }
+      ]
+    ]
+};
 exports.formResponseArray = [
     {
     "_id": "606af26e0b77321ae8eac21a",
