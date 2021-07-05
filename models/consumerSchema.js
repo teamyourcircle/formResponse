@@ -5,7 +5,7 @@ var queueSchema = new mongoose.Schema(
       queueName: { 
         type: String,
         enum: {
-          values: ['hello','google-sheets','google-calendar'],
+          values: ['hello','google-sheets','google-calendar','webhook'],
           message: 'input consumer not exists',
         },
         required: true
