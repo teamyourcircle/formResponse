@@ -31,11 +31,11 @@ describe('test for third party create sheet', (done) => {
     nock(config.FORM_RESPONSE_BASE_URL).get('/form/api/myforms')
     .reply(HttpStatus.OK,bodyObj.myForms);
     nock(config.AUTH_SERVICE_BASE_URL).get(`/auth/api/user/oauthApps/byIntegrationId${queryString}`)
-    .reply(HttpStatus.OK,bodyObj.integartionListWithoutAdditionInfo);
+    .reply(HttpStatus.OK,bodyObj.integrationListWithoutAdditionInfo);
     nock(config.FORM_RESPONSE_BASE_URL).get(`/form/api/get/responses?formId=${requestBody.formId}`)
     .reply(HttpStatus.OK,{'responseArray':bodyObj.formResponseArray});
     nock(config.AUTH_SERVICE_BASE_URL).get('/auth/api/user/oauthApps')
-    .reply(HttpStatus.OK,bodyObj.integartionListWithoutAdditionInfo);
+    .reply(HttpStatus.OK,bodyObj.integrationListWithoutAdditionInfo);
     status=HttpStatus.OK;
     var stub2 = sinon.stub(oauth_sheet_helper,"sheetCreator");
     stub2.withArgs(requestBody,bodyObj.formResponseArray,{});

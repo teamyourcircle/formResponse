@@ -120,7 +120,7 @@ const get_info_for_consumer = async (queueName,token,formId) =>{
     if(consumerInfo.length){
         //consumerInfo[0].emails = getSupportiveEmails(queueName,token);
         let data = await getSupportiveEmails(queueName,token);
-        let integration_list = data.integartionList;
+        let integration_list = data.integrationList;
         let emails = [];
         let active_email = '';
         if(integration_list){

@@ -229,7 +229,7 @@ exports.formTemplatedeleteRes = {'status':'done','id':20}
 exports.formTemplate = {"template": {"form": {"form_title": "sheet Form", "form_description": "Description Section"}, "section": {"section_title": ["Section Title"], "section_description": [""], "section_fields": [2]}, "field": {"field_description": ["", ""], "field_label": ["name", "gender"], "field_type_list": [{"field_type": "text", "index": 0, "options": [], "required": false, "plugins": []}, {"field_type": "choice", "index": 1, "options": ["male", "female"], "required": false, "plugins": []}]}, "form_info": {"form_title": "sheet Form", "form_id": 420, "init": "12/03/2021 | 17:44 PM", "end": "14/04/2021 | 08:19 AM"}}};
 
 exports.integrationList = {
-    "integartionList": [
+    "integrationList": [
       {
         "_id": "",
         "social_id": "",
@@ -250,8 +250,8 @@ exports.integrationList = {
     ]
   };
 
-exports.integartionListWithoutAdditionInfo = {
-    "integartionList": [
+exports.integrationListWithoutAdditionInfo = {
+    "integrationList": [
       {
         "_id": "",
         "social_id": "",
@@ -394,7 +394,7 @@ exports.credentialsBody = {
 }
 
 exports.dropboxIntegrationList = {
-    "integartionList": [
+    "integrationList": [
         {
           "_id": "",
           "social_id": "",

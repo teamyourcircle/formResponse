@@ -13,13 +13,13 @@ const integration_provider = (req, res, next) => {
     checkOAuthIntegrator(req.body, token)
     .then(resp => resp.json())
     .then(data => {
-        logger.debug('integartionList fetched');
+        logger.debug('integrationList fetched');
         if(data){
             logger.debug('search refresh token');
-            if( data.integartionList && data["integartionList"].length){
-                req.refresh_token = data["integartionList"][0]['refresh_token'];
-                req.access_token = data["integartionList"][0]['access_token'];
-                req.oauthBody=data["integartionList"][0];
+            if( data.integrationList && data["integrationList"].length){
+                req.refresh_token = data["integrationList"][0]['refresh_token'];
+                req.access_token = data["integrationList"][0]['access_token'];
+                req.oauthBody=data["integrationList"][0];
             }
             else{
                 logger.debug('integartionId/refersh_token not found');
