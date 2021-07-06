@@ -1,5 +1,6 @@
 const google_sheet_consumer = require('../consumers/google_sheet');
 const google_caledar_consumer = require('../consumers/google_calendar');
+const webhook_worker = require('../consumers/webhook');
 const resource = require('./resources/body_obj')
 const chai = require('chai');
 const HttpStatus = require('http-status-codes');
@@ -62,3 +63,15 @@ describe('test the payload creator with template',function () {
     })
 
 })
+
+describe('test suite for webhook consumer', () => {
+    it('test for the function :: webhook_worker',(done)=>{
+        nock(`${config.AUTH_SERVICE_BASE_URL}`)
+        .post('/auth/api/webhook/provider/init')
+        .reply(HttpStatus.OK,resource.replyFromInitApi);
+
+        webhook_worker('webhook',JSON.stringify(resource.fakePayloadForWebhook));
+        done()
+    })
+})
+

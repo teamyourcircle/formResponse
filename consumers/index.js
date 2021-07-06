@@ -72,5 +72,17 @@ module.exports = [
         feature_flag: true,
         logo: "https://img.icons8.com/fluent/48/000000/google-calendar--v2.png",
         description: "on incoming new response we will create a new event on connected google calendar"
+    },
+    {
+        queue: "webhook",
+        consumer: require('./webhook'),
+        params: [],
+        tags: ["webhook"] ,
+        actions: ["create a webhook init request"],
+        name: "webhook_consumer",
+        display_name: "Webhook",
+        authRequired: false,
+        feature_flag: true,
+        description: "on incoming new response we will initialize a delivery request on given endpoint"
     }
 ]

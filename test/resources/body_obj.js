@@ -409,3 +409,24 @@ exports.dropboxIntegrationList = {
     ]
 }
 exports.folderIdResponse = {'folder_id':'0123456789'}
+
+exports.fakePayloadForWebhook={
+    'formId': '118',
+    "sections": [
+        [
+          {
+            "is_choice": true,
+            "skills": {
+              "c": 1,
+              "java": 0,
+              "python": 0,
+              "js": 0
+            }
+          }
+        ]
+    ]
+}
+
+exports.replyFromInitApi={
+    message:'pipeline initiated with tag :: pipe'
+}
