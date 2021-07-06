@@ -39,7 +39,14 @@ const webhook_worker=(queue,payload)=>{
         body:JSON.stringify({id:payload.formId,request_payload:payload})
     }
     fetch(url,options)
-    .then((res)=>{return res.json()})
+    .then((res)=>{
+        if(res.ok){
+            return res.json()
+        }
+        else{
+            return Promise.reject(res)
+        }
+    })
     .then((result)=>{
         logger.debug(`Result from webhook init request :: ${result.message}`)
     })
