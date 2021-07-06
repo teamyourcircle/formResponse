@@ -44,7 +44,7 @@ const webhook_worker=(queue,payload)=>{
             return res.json()
         }
         else{
-            return Promise.reject(res)
+            return Promise.reject('cannot able to init webhook provider')
         }
     })
     .then((result)=>{
