@@ -2,11 +2,11 @@ const redis = require('redis');
 const logger = require('./logger');
 const fetch = require('node-fetch');
 const {google} = require('googleapis');
-const publisher = redis.createClient();
-const apiUtils = require('../util/apiUtils');
-const HttpStatus = require('http-status-codes');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
+const publisher = redis.createClient(config.redis_port, config.redis_host);
+const apiUtils = require('../util/apiUtils');
+const HttpStatus = require('http-status-codes');
 const integration_id = "google-sheets";
 
 /**
