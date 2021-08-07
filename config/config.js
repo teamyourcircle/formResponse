@@ -11,6 +11,9 @@ module.exports= {
         RABBIT_MQ_URL: process.env.RABBIT_MQ_URL,
         basic_auth_username:process.env.BASIC_AUTH_USERNAME,
         basic_auth_password:process.env.BASIC_AUTH_PASSWORD,
+        redis_host:process.env.REDIS_HOST,
+        redis_port:process.env.REDIS_PORT,
+        redis_password:process.env.REDIS_PASSWORD
     },
     test:{
         uri: process.env.URI,
@@ -22,6 +25,9 @@ module.exports= {
         RABBIT_MQ_URL: process.env.RABBIT_MQ_URL,
         basic_auth_username:process.env.BASIC_AUTH_USERNAME,
         basic_auth_password:process.env.BASIC_AUTH_PASSWORD,
+        redis_host:process.env.REDIS_HOST,
+        redis_port:process.env.REDIS_PORT,
+        redis_password:process.env.REDIS_PASSWORD
     }
 }
 
