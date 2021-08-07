@@ -5,7 +5,11 @@ const config = require('./config/config')[env];
 const consumers = require('./consumers');
 var socket = require('socket.io');
 const redis = require('redis');
-const subscriber = redis.createClient(config.redis_port, config.redis_host);
+const subscriber = redis.createClient({
+    port: config.redis_port,
+    host: config.redis_host,
+    password: config.redis_password
+});
 const busses = require('./subscribers');
 const filter_function_by_busname = require('./subscribers/subscriber');
 const logger = require('./util/logger');
